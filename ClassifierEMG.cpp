@@ -2,7 +2,8 @@
 #include <ctime>
 
 static DWORD WINAPI MatlabThreadEntry(PVOID arg)
-{		
+{
+	// MatlabEng is called only here
 	((CEMG *)arg)-> MatlabEng();
 	return 0;
 }
@@ -214,9 +215,13 @@ CEMG::CEMG()
 	state=REST;
 	dur=-1;             //LB// REST状态下dur=-1
 	memset(data,0,sizeof(data));          //LB// 将已经开辟内存空间data的sizeof(data)个字节的值设为0，对较大的结构体或数组进行清零的最快方法。
-	memset(data_rms,0,sizeof(data_rms));
-	memset(data_rms_max,1,sizeof(data_rms_max));
-	rms_index=-1;
+
+	//// 初始化均方根值相关的变量，这些变量可能只是用来画GUI的
+	//memset(data_rms,0,sizeof(data_rms));
+	//memset(data_rms_max,1,sizeof(data_rms_max));
+	//rms_index=-1;
+
+
 	Is_Correct_Num = 0;
 
 }
@@ -442,25 +447,27 @@ void CEMG::MatlabEng()
 		if(data_index>mat_index)    //LB// “data.txt”写入数据后，data_index为原始写入数据的行数，mat_index为数据行索引（初始值为-1）。
 		{		
 			mat_index++;
-			if(mat_index%100==0)        //LB// mat_index=100,200,300……
-			{
-				rms_index++;                           //LB// 每100行数据，rms_index加一（初始值为-1）
-				for(int i=0;i<channel_num;i++)
-					data_rms[i][rms_index%50]=0;       //LB// data_rms为channel_num行50列的数组，赋用到的列初值为0
-				for(int j=0;j<50;j++)
-				{
-					int j0=(mat_index+DATA_LENGTH-j)%DATA_LENGTH;
-					for(int i=0;i<channel_num;i++)
-						data_rms[i][rms_index%50]+=data[j0][channel_used[i]]*data[j0][channel_used[i]];//LB//前50行各个通道数据的平方和
-				}
-				for(int i=0;i<channel_num;i++)
-				{
-					data_rms[i][rms_index%50]=sqrt(data_rms[i][rms_index%50]);
-					if(data_rms[i][rms_index%50]>data_rms_max[i])
-						data_rms_max[i]=data_rms[i][rms_index%50];
-					data_rms[i][rms_index%50]=(data_rms[i][rms_index%50]/data_rms_max[i]); //LB// data_rms是用来画能量条用的
-				}
-			}
+
+			//// 避免频繁的画图操作，所以这里每100个画一次
+			//if(mat_index%100==0)        //LB// mat_index=100,200,300……
+			//{
+			//	rms_index++;                           //LB// 每100行数据，rms_index加一（初始值为-1）
+			//	for(int i=0;i<channel_num;i++)
+			//		data_rms[i][rms_index%50]=0;       //LB// data_rms为channel_num行50列的数组，赋用到的列初值为0
+			//	for(int j=0;j<50;j++)
+			//	{
+			//		int j0=(mat_index+DATA_LENGTH-j)%DATA_LENGTH;
+			//		for(int i=0;i<channel_num;i++)
+			//			data_rms[i][rms_index%50]+=data[j0][channel_used[i]]*data[j0][channel_used[i]];//LB//前50行各个通道数据的平方和
+			//	}
+			//	for(int i=0;i<channel_num;i++)
+			//	{
+			//		data_rms[i][rms_index%50]=sqrt(data_rms[i][rms_index%50]);
+			//		if(data_rms[i][rms_index%50]>data_rms_max[i])
+			//			data_rms_max[i]=data_rms[i][rms_index%50];
+			//		data_rms[i][rms_index%50]=(data_rms[i][rms_index%50]/data_rms_max[i]); //LB// data_rms是用来画能量条用的
+			//	}
+			//}
 
 			if(IS_TRAIN && mat_index%TIME_INCEMENT==0 && mat_index%(1000*ACTION_TIME_TRAINING)>=TIME_INTERVAL)//LB// 训练状态下 每(1000*ACTION_TIME_TRAINING)个数据中的后2000个 每100个数据做一次特征提取
 			{

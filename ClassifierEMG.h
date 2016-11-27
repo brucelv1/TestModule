@@ -30,9 +30,12 @@ public:
 	double	data[DATA_LENGTH][DATA_CHANNEL];
 	double	data_predict[DATA_LENGTH];
 
-	double	data_rms[DATA_CHANNEL][100];
-	double	data_rms_max[DATA_CHANNEL];	
-	int		rms_index;
+	//// 只是用来画图的
+	//double	data_rms[DATA_CHANNEL][100]; // 只在MatlabEng中更新
+	//double	data_rms_max[DATA_CHANNEL];	 // 只在MatlabEng中更新
+	//int		rms_index;                   // 只在MatlabEng中更新
+
+
 	int		data_index; // 原始数据行号，可以溢出
 	int		mat_index;  // 数据处理行号，可以溢出
 
@@ -54,8 +57,12 @@ public:
 	char    file_fea[100];
 	char    file_date[100];
 
+	// TRAIN Part
+	// feature matrix and label vector
 	vector<vector<double> > fea;
 	vector<int>	label;
+
+
 	vector<int> online_label;//LB//在线测试
 	vector<int> online_set_label;//LB//在线测试
 	int		random_figure;

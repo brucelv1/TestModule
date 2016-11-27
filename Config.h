@@ -1,9 +1,3 @@
-//LB//2014.5.28 EMG臂带测试成功，DEVICE部分无问题
-//LB//2014.5.28 CVR reconfigure 部分无问题 可以重构实验范式，选择动作时间
-//LB//APP_DEVICE 小车部分仍有问题
-//LB//2014.5.29 在线测试部分实现
-//LB//2014.5.30 FEATURE实现
-
 #pragma once
 
 /***********在这里选择输入设备，注意从0开始**************/
@@ -20,13 +14,10 @@ enum DEVICES{EMG_NIR,BIOMETRICS,DELSYS,EMG};
 #define ACTION_TIME_ONLINE_TESTING 10
 #define REST_TIME_ONLINE_TESTING   5
 
-#ifdef BUILD_AIR_GESTURE
-	#define ACTION_NUM          16    //1个trial的总动作数
-	#define ACTION_NUM_ONLINE_TESTING  9
-#else
-	#define ACTION_NUM          8    //1个trial的总动作数
-	#define ACTION_NUM_ONLINE_TESTING  5
-#endif
+
+#define ACTION_NUM          8    //1个trial的总动作数
+#define ACTION_NUM_ONLINE_TESTING  5
+
 //#define ACTION_SERIAL       {13,1,2,3,4,5,6,7,8,9,10,11,12}
 
 /***********在这里选择通道数，注意与config.txt里保持一致**************/
@@ -56,10 +47,8 @@ enum TESTDAYS{FIRST,SECOND,OTHERS};
 #define TRIAL_NUM			1
 
 
-//#define _OnLineTest_ 
-
 #if(IS_OnLineTest)
-#define DATA_LENGTH		(ACTION_NUM_ONLINE_TESTING*ACTION_TIME_ONLINE_TESTING*1000)
+#define DATA_LENGTH		(ACTION_NUM_ONLINE_TESTING*ACTION_TIME_ONLINE_TESTING*1000) // used to be 1000
 #else
 #define DATA_LENGTH			(ACTION_NUM*ACTION_TIME_TRAINING*1000)
 #endif

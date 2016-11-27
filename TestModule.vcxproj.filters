@@ -24,9 +24,39 @@
     <ClCompile Include="moc_Dlg_TestModule.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ClassifierEMG.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="svm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Byesclassifier.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI\ui_TestModule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassifierEMG.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MathUtility.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Byesclassifier.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="complex.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="svm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

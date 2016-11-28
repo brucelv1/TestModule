@@ -78,31 +78,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Byesclassifier.cpp" />
-    <ClCompile Include="ClassifierEMG.cpp" />
-    <ClCompile Include="Config.cpp" />
     <ClCompile Include="Dlg_TestModule.cpp" />
     <ClCompile Include="HelperArmBand.cpp" />
     <ClCompile Include="LDA_Bayesian.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MathUtility.cpp" />
     <ClCompile Include="moc_Dlg_TestModule.cpp" />
     <ClCompile Include="svm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Byesclassifier.h" />
-    <ClInclude Include="complex.hpp" />
-    <ClInclude Include="Config.h" />
     <ClInclude Include="HelperArmBand.h" />
     <ClInclude Include="LDA_Bayesian.h" />
-    <ClInclude Include="MathUtility.h" />
     <ClInclude Include="svm.h" />
     <CustomBuild Include="Dlg_TestModule.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc.exe Dlg_TestModule.h -o moc_Dlg_TestModule.cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc_Dlg_TestModule.cpp</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc.exe Dlg_TestModule.h</AdditionalInputs>
     </CustomBuild>
-    <ClInclude Include="ClassifierEMG.h" />
     <ClInclude Include="GUI\ui_TestModule.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

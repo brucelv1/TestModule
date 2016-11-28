@@ -2,7 +2,6 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <iostream>
-#include "ClassifierEMG.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <QtGui/QMessageBox>
@@ -17,7 +16,7 @@ Dlg_TestModule::Dlg_TestModule( QWidget* parent /*= NULL*/ )
 
 Dlg_TestModule::~Dlg_TestModule()
 {
-
+	_mThread.join();
 }
 
 void Dlg_TestModule::on_BtnImportConfig_clicked()
@@ -112,6 +111,11 @@ void Dlg_TestModule::on_Btn_Connect_clicked()
 	}
 }
 
+void Dlg_TestModule::on_Btn_StartTest_clicked()
+{
+	_mThread = boost::thread(boost::bind(&(Dlg_TestModule::_threadSend),this));
+}
+
 void Dlg_TestModule::_parseTrainConfig()
 {
 	using namespace boost::property_tree;
@@ -157,4 +161,9 @@ void Dlg_TestModule::_parseTrainConfig()
 
 	_commandVec.clear();
 	_commandVec = InfoVec;
+}
+
+void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm )
+{
+
 }

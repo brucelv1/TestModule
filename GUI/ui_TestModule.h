@@ -46,7 +46,7 @@ public:
     QGroupBox *groupBox_2;
     QSpinBox *spinB_ActionTimes;
     QLabel *label_3;
-    QPushButton *pushButton;
+    QPushButton *Btn_StartTest;
     QProgressBar *progressBar;
 
     void setupUi(QDialog *TestModule)
@@ -119,9 +119,9 @@ public:
         label_3 = new QLabel(groupBox_2);
         label_3->setObjectName(QString::fromUtf8("label_3"));
         label_3->setGeometry(QRect(20, 30, 101, 31));
-        pushButton = new QPushButton(TestModule);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setGeometry(QRect(10, 360, 81, 31));
+        Btn_StartTest = new QPushButton(TestModule);
+        Btn_StartTest->setObjectName(QString::fromUtf8("Btn_StartTest"));
+        Btn_StartTest->setGeometry(QRect(10, 360, 81, 31));
         progressBar = new QProgressBar(TestModule);
         progressBar->setObjectName(QString::fromUtf8("progressBar"));
         progressBar->setGeometry(QRect(110, 360, 331, 31));
@@ -156,7 +156,7 @@ public:
         label_2->setText(QApplication::translate("TestModule", "\350\277\236\346\216\245\347\212\266\346\200\201\357\274\232", 0, QApplication::UnicodeUTF8));
         groupBox_2->setTitle(QApplication::translate("TestModule", "\346\265\213\350\257\225\347\233\270\345\205\263\350\256\276\347\275\256", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("TestModule", "\346\257\217\344\270\252\345\212\250\344\275\234\351\207\215\345\244\215\346\254\241\346\225\260", 0, QApplication::UnicodeUTF8));
-        pushButton->setText(QApplication::translate("TestModule", "\345\274\200\345\247\213\346\265\213\350\257\225", 0, QApplication::UnicodeUTF8));
+        Btn_StartTest->setText(QApplication::translate("TestModule", "\345\274\200\345\247\213\346\265\213\350\257\225", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

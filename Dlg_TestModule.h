@@ -5,6 +5,7 @@
 #include "GUI/ui_TestModule.h"
 #include <deque>
 #include "HelperArmBand.h"
+#include <boost/thread.hpp>
 
 class Dlg_TestModule : public QDialog, public Ui_TestModule
 {
@@ -44,19 +45,24 @@ private:
 	SJTArmBand* _armBand;
 	std::vector<std::vector<double> > _armBandData;
 
+	// thread: get data, send command, ...
+	boost::thread _mThread;
+
 public:
 	Dlg_TestModule(QWidget* parent = NULL);
 	~Dlg_TestModule();
 
 private:
 	void _parseTrainConfig();
-	void _readTrainData();
+
+	static void _threadSend(Dlg_TestModule* dtm);
 
 public slots:
 	void on_BtnImportConfig_clicked();
 	void on_BtnImportData_clicked();
 	void on_BtnCreateClassifier_clicked();
 	void on_Btn_Connect_clicked();
+	void on_Btn_StartTest_clicked();
 };
 
 #endif // _DLG_TEST_MODULE_

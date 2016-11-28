@@ -10,6 +10,7 @@
 
 Dlg_TestModule::Dlg_TestModule( QWidget* parent /*= NULL*/ )
 	: QDialog(parent)
+	, _armBand(new SJTArmBand())
 {
 	setupUi(this);
 }
@@ -84,13 +85,30 @@ void Dlg_TestModule::on_BtnCreateClassifier_clicked()
 	lb.FeatureExtract(trainData,labelVec);
 	if(lb.GenerateModel()==true)
 	{
-		QMessageBox::information(NULL, "Information", "LDA model is generated.", QMessageBox::Ok);
+		LEClassifierStatus->setText("LDA model is generated.");
 		return;
 	}
 	else
 	{
 		QMessageBox::information(NULL, "Information", "Fail to generate LDA model.", QMessageBox::Ok);
+		LEClassifierStatus->setText("Failed, please try again.");
 		return;
+	}
+}
+
+void Dlg_TestModule::on_Btn_Connect_clicked()
+{
+	std::string strCom = cbBox_Armband->currentText().toStdString();
+	int nCOM = std::atoi( (strCom.substr(3,strCom.size()-3)).c_str() );
+
+	if(_armBand->Connect(nCOM)==false)
+	{
+		LE_Armband_Status->setText("Connection Failed.");
+		return;
+	}
+	else
+	{
+		LE_Armband_Status->setText("Connection Successful.");
 	}
 }
 

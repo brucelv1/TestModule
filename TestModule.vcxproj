@@ -82,6 +82,7 @@
     <ClCompile Include="ClassifierEMG.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Dlg_TestModule.cpp" />
+    <ClCompile Include="HelperArmBand.cpp" />
     <ClCompile Include="LDA_Bayesian.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathUtility.cpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="Byesclassifier.h" />
     <ClInclude Include="complex.hpp" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="HelperArmBand.h" />
     <ClInclude Include="LDA_Bayesian.h" />
     <ClInclude Include="MathUtility.h" />
     <ClInclude Include="svm.h" />

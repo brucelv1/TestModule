@@ -4,6 +4,7 @@
 #include <QtGui/QDialog>
 #include "GUI/ui_TestModule.h"
 #include <deque>
+#include "HelperArmBand.h"
 
 class Dlg_TestModule : public QDialog, public Ui_TestModule
 {
@@ -34,9 +35,15 @@ private:
 	};
 	std::vector< std::shared_ptr<_commandInfo> > _commandVec;
 
+	// file path
 	std::string _mTrainConfigPath;
 	std::string _mTrainDataPath;
 	std::deque<std::vector<double> > _mDataBuffer;
+
+	// ArmBand
+	SJTArmBand* _armBand;
+	std::vector<std::vector<double> > _armBandData;
+
 public:
 	Dlg_TestModule(QWidget* parent = NULL);
 	~Dlg_TestModule();
@@ -49,6 +56,7 @@ public slots:
 	void on_BtnImportConfig_clicked();
 	void on_BtnImportData_clicked();
 	void on_BtnCreateClassifier_clicked();
+	void on_Btn_Connect_clicked();
 };
 
 #endif // _DLG_TEST_MODULE_

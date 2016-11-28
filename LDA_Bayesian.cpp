@@ -90,9 +90,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 	PoolCovMat/=(feat_num-cnum);
 	PoolCovMat = PoolCovMat.inverse();
 
-	//transform the data formate from Eigen to Vector
-	vector<vector<double> > modelmean;
-	vector<vector<double> > modelcov;
+	//transform the data format from Eigen to Vector
 	vector<double> temp;
 	for(int i=0;i<cnum;i++)
 	{
@@ -100,7 +98,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 		{
 			temp.push_back(MeanMat(i,j));
 		}
-		modelmean.push_back(temp);
+		_mModelMean.push_back(temp);
 		temp.clear();
 	}
 	for(int i=0;i<feat_dim;i++)
@@ -109,7 +107,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 		{
 			temp.push_back(PoolCovMat(i,j));
 		}
-		modelcov.push_back(temp);
+		_mModelCov.push_back(temp);
 		temp.clear();
 	}
 
@@ -124,7 +122,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 	for(int i=0;i<cnum;i++)
 	{
 		for(int j=0;j<feat_dim;j++)
-			savefile<<modelmean[i][j]<<'\t';
+			savefile<<_mModelMean[i][j]<<'\t';
 		savefile<<'\n';
 	}
 	savefile.close();
@@ -139,7 +137,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 	for(int i=0;i<feat_dim;i++)
 	{
 		for(int j=0;j<feat_dim;j++)
-			savefile<<modelcov[i][j]<<'\t';
+			savefile<<_mModelCov[i][j]<<'\t';
 		savefile<<'\n';
 	}
 	savefile.close();

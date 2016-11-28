@@ -9,8 +9,13 @@ private:
 	typedef std::vector<int> Vector1I;
 	typedef std::vector<std::vector<double> > Vector2D;
 
+	// pre-model data, used to generate model parameters
 	Vector2D _mFeatureMatrix;
 	Vector1I _mLabelVector;
+
+	// model parameters
+	Vector2D _mModelMean;
+	Vector2D _mModelCov;
 
 	// window width of feature extraction
 	int _mFeaWinWidth;

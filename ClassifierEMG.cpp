@@ -45,6 +45,7 @@ int* create_randperm(int length){//LB//产生length长度的随机数组
 返回值  ：无
 ********************************************/
 CEMG::CEMG()
+	: m_hThread(NULL)
 {
 	std::ifstream file_temp(".\\data\\config.txt"); //LB// 读inc/config.txt中的串口号及通道信息
 
@@ -210,7 +211,7 @@ CEMG::CEMG()
 	mat_index=-1;
 	mat_over=true;
 
-	m_hThread=CreateThread(NULL,0,MatlabThreadEntry,(PVOID)this,0,NULL);  //LB// MatlabThreadEntry表示新线程执行的线程函数地址  后一个0表示线程创建后立即调度
+	//m_hThread=CreateThread(NULL,0,MatlabThreadEntry,(PVOID)this,0,NULL);  //LB// MatlabThreadEntry表示新线程执行的线程函数地址  后一个0表示线程创建后立即调度
 
 	state=REST;
 	dur=-1;             //LB// REST状态下dur=-1
@@ -616,6 +617,161 @@ void CEMG::feature_extract()       //LB// 训练状态下mat_index=3000，3100，……；
 			online_label.push_back(data_predict[mat_index%DATA_LENGTH]);//LB// 将data_predict加入label的尾部   为什么减50？改回
 		}
 	}	
+}
+
+
+void CEMG::feature_extract(Vector2D& DataMatrix, Vector1I& Label, Vector2D& FeatureRet, Vector1I& LabelRet)
+{
+	FeatureRet.clear();
+	LabelRet.clear();
+	// 一次性对所有数据进行特征采集
+	for (size_t smp_idx=0; smp_idx<DataMatrix.size(); smp_idx += TIME_INTERVAL)
+	{
+		vector<double> fea_temp;
+		int label_temp;
+		fea_temp.resize(fea_num);
+		int channel_index;
+		if(FEATUREN==EMG_TD||FEATUREN==EMGTD_NIR)
+		{
+			// feature TD
+			// 3 features: fea0-绝对值之和, fea1-过零点数, fea2-波长, fea3-导数拐点
+			for(int i=0;i<4;i++)//LB// channel_num=8 here
+			{
+				channel_index=channel_used[i]; // 1 2 3 4
+				fea_temp[i*4]=0;fea_temp[i*4+1]=0;fea_temp[i*4+2]=0;fea_temp[i*4+3]=0;			
+				for(int j=0;j<TIME_INTERVAL;j++)
+				{
+					//int j0=(mat_index+DATA_LENGTH-TIME_INTERVAL+j)%DATA_LENGTH;   
+					//int j1=(mat_index+DATA_LENGTH-TIME_INTERVAL+j-1)%DATA_LENGTH;
+					//int j2=(mat_index+DATA_LENGTH-TIME_INTERVAL+j-2)%DATA_LENGTH;
+					
+					// TIME_INTERVAL数据窗中的数据，j0是当前采样，j1是上一次采样，j2是再前一次采样;
+					int j0 = smp_idx+j;
+					int j1 = j0-1;
+					int j2 = j0-2;
+
+					//fea0// fea_temp[0 4 8……]位上分别是0 1 2通道上前(TIME_INTERVAL)个数据绝对值的和
+					fea_temp[i*4]+=abs(DataMatrix[j0][channel_index]);
+					if(j>0)
+					{
+						//fea1// fea_temp[1 5 9……]位上分别是0 1 2通道上前(TIME_INTERVAL)个数据相邻两个相乘是否大于0的状态的总和
+						fea_temp[i*4+1]+=int(DataMatrix[j0][channel_index]*DataMatrix[j1][channel_index]>0);
+						//fea2// fea_temp[2 6 10……]位上分别是0 1 2通道上前(TIME_INTERVAL)个数据相邻两个之差的绝对值的总和
+						fea_temp[i*4+2]+=abs(DataMatrix[j0][channel_index]-DataMatrix[j1][channel_index]);
+					}
+					if(j>1)
+					{
+						//fea3// fea_temp[3 8 11……]位上分别是0 1 2通道上前(TIME_INTERVAL)个数据相邻两个数据之差的乘积是否大于0的状态的总和
+						fea_temp[i*4+3]+=int((DataMatrix[j0][channel_index]-DataMatrix[j1][channel_index])*(DataMatrix[j1][channel_index]-DataMatrix[j2][channel_index])>0);
+					}
+
+					// label
+					// take mid-window label as the window's label
+					if (j==TIME_INTERVAL/2)
+					{
+						label_temp = Label[j0];
+					}
+				}
+			}
+
+			// feature NIR -- I do not care
+			for(int i=4;i<channel_num;i++)//LB// channel_num=8 here
+			{
+				channel_index=channel_used[i]; // 5 6 7 8
+				fea_temp[4*4+(i-4)*2]=0;fea_temp[4*4+(i-4)*2+1]=0;			
+				for(int j=0;j<TIME_INTERVAL;j++)
+				{
+					//int j0=(mat_index+DATA_LENGTH-TIME_INTERVAL+j)%DATA_LENGTH;   
+					//int j1=(mat_index+DATA_LENGTH-TIME_INTERVAL+j-1)%DATA_LENGTH;
+					////int j2=(mat_index+DATA_LENGTH-TIME_INTERVAL+j-2)%DATA_LENGTH;
+
+					// TIME_INTERVAL数据窗中的数据，j0是当前采样，j1是上一次采样;
+					int j0 = smp_idx+j;
+					int j1 = j0-1;
+
+					//fea0// fea_temp[16 18 20 22]位上分别是5 6 7 8通道上前(TIME_INTERVAL)个数据绝对值的和
+					fea_temp[4*4+(i-4)*2]+=DataMatrix[j0][channel_index];   
+					if(j>0)
+					{
+						//fea2// fea_temp[17 19 21 23]位上分别是5 6 7 8通道上前(TIME_INTERVAL)个数据相邻两个之差的绝对值的总和
+						fea_temp[4*4+(i-4)*2+1]+=abs(DataMatrix[j0][channel_index]-DataMatrix[j1][channel_index]);
+					}
+
+				}
+				fea_temp[4*4+(i-4)*2]=fea_temp[4*4+(i-4)*2]/TIME_INTERVAL;
+			}
+		}
+
+		//finish = clock();
+		//double totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+		//double ttime = 100;
+		if(IS_TRAIN)
+		{
+			FeatureRet.push_back(fea_temp);
+			LabelRet.push_back(label_temp);
+		}
+		else
+		{
+			//LB// 测试时根据SVM给出判断结果
+			if(CLASSIFIER==SVM)
+			{
+				//clock_t start;
+				//clock_t finish;
+				//start = clock();
+				//根据SVM给出判断结果
+				for(int k=0;k<fea_num;k++)
+				{
+					x[k].index=k;
+					x[k].value=fea_temp[k];
+				}
+				data_predict[mat_index%DATA_LENGTH]=int(svm_predict(model,x));
+				//finish = clock();
+				//double totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+				//double ttime = 100;
+			}
+			else
+			{
+				//clock_t start;
+				//clock_t finish;
+				//start = clock();
+
+
+				// Byespredict is called only here
+				data_predict[mat_index%DATA_LENGTH]=int(Byespredict(lda_model_cov,lda_model_mean,fea_temp));
+
+
+				//finish = clock();
+				//double totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+				//double ttime = 100;
+				//lda_feat.clear();
+			}//LB// 定义double data_predict[DATA_LENGTH]是每行数据的模式状态
+
+			if(IS_OnLineTest)
+			{
+				random_figure=class_num-1;//LB//一般状态下random_figure为REST
+				//if((mat_index/1000)%ACTION_TIME_ONLINE_TESTING==0)
+				//{
+				//	Is_Correct_Num = 0;
+				//	Is_Action = false;
+				//}
+				if((mat_index/1000)%ACTION_TIME_ONLINE_TESTING>=REST_TIME_ONLINE_TESTING)//LB//在线测试状态下，前3s为REST，后6s为随机动作
+				{
+					random_figure=random_hand_serial[mat_index/(1000*ACTION_TIME_ONLINE_TESTING)];
+					//if((mat_index/(1000*ACTION_TIME_TRAINING))==12)
+					//random_figure=12;
+					if(data_predict[mat_index%DATA_LENGTH]==random_figure)
+						Is_Correct_Num++;
+				}
+				else
+				{
+					Is_Correct_Num = 0;
+					Is_Action = false;
+				}
+				online_set_label.push_back(random_figure);
+				online_label.push_back(data_predict[mat_index%DATA_LENGTH]);//LB// 将data_predict加入label的尾部   为什么减50？改回
+			}
+		}
+	}
 }
 
 void CEMG::SVMtrain()

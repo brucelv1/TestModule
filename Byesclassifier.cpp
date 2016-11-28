@@ -11,7 +11,7 @@ void Byestrain(vector<vector<double> > feat, vector<int> label)
 	if(lab_num!=feat_num)
 	{
 		std::cerr<<"the number of features is not equal to the number of labels"<<std::endl;
-		getchar();
+		return;
 	}
 	//unique label of labels
 	vector<int> unilabel;
@@ -125,7 +125,7 @@ int Byespredict(vector<vector<double> > PoolCovMat,vector<vector<double> > MeanM
 	if(dim_x!=feat_dim)
 	{
 		std::cerr<<"the dimension of features is not equal to the dimension of Gaussian Model"<<std::endl;
-		getchar();
+		return -1;
 	}
 	MatrixXd feat = MatrixXd::Zero(1,feat_dim);
 	MatrixXd Cov = MatrixXd::Zero(feat_dim,feat_dim);
@@ -155,12 +155,12 @@ int Byespredict(vector<vector<double> > PoolCovMat,vector<vector<double> > MeanM
 	int predict;
 	for(i=0;i<cnum;i++)
 	{
+		// 马氏距离，Cov是真正协方差的逆矩阵
 		gx = (feat.row(0)-Mean.row(i))*Cov*(feat.row(0)-Mean.row(i)).transpose();
 		if(i==0)
 		{
 			mingx = gx;
 			predict = i;
-
 		}
 		else
 		{

@@ -125,6 +125,10 @@ public:
 ********************************************/
 	void feature_extract();       //LB// 训练状态下mat_index=3000，3100，……；测试状态下mat_index=300，400，……
 	
+	// 供外部使用，内部禁止调用
+	typedef std::vector<int> Vector1I;
+	typedef std::vector<std::vector<double> > Vector2D;
+	void feature_extract(Vector2D& DataMatrix, Vector1I& Label, Vector2D& FeatureRet, Vector1I& LabelRet);
 
 	void SVMtrain();
 };

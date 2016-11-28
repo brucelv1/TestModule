@@ -4,6 +4,9 @@
 # Library Headers and Srcs
 eigen-3.2.1/
 
+# data file
+data/
+
 # User-specific files
 *.suo
 *.user

@@ -6,6 +6,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <QtGui/QMessageBox>
+#include "ClassifierEMG.h"
 
 Dlg_TestModule::Dlg_TestModule( QWidget* parent /*= NULL*/ )
 	: QDialog(parent)
@@ -79,6 +80,14 @@ void Dlg_TestModule::on_BtnCreateClassifier_clicked()
 		trainData.push_back(data_tmp);
 	}
 
+	// extract features
+	std::vector<std::vector<double> > featureRet;
+	std::vector<int> labelRet;
+	CEMG _cemg;
+	_cemg.feature_extract(trainData,labelVec,featureRet,labelRet);
+
+	// generate classifier
+	Byestrain(featureRet,labelRet);
 }
 
 void Dlg_TestModule::_parseTrainConfig()

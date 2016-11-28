@@ -6,7 +6,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <QtGui/QMessageBox>
-#include "ClassifierEMG.h"
+#include "LDA_Bayesian.h"
 
 Dlg_TestModule::Dlg_TestModule( QWidget* parent /*= NULL*/ )
 	: QDialog(parent)
@@ -80,14 +80,18 @@ void Dlg_TestModule::on_BtnCreateClassifier_clicked()
 		trainData.push_back(data_tmp);
 	}
 
-	// extract features
-	std::vector<std::vector<double> > featureRet;
-	std::vector<int> labelRet;
-	CEMG _cemg;
-	_cemg.feature_extract(trainData,labelVec,featureRet,labelRet);
-
-	// generate classifier
-	Byestrain(featureRet,labelRet);
+	LDA_Bayesian lb;
+	lb.FeatureExtract(trainData,labelVec);
+	if(lb.GenerateModel()==true)
+	{
+		QMessageBox::information(NULL, "Information", "LDA model is generated.", QMessageBox::Ok);
+		return;
+	}
+	else
+	{
+		QMessageBox::information(NULL, "Information", "Fail to generate LDA model.", QMessageBox::Ok);
+		return;
+	}
 }
 
 void Dlg_TestModule::_parseTrainConfig()

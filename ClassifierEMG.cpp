@@ -620,7 +620,7 @@ void CEMG::feature_extract()       //LB// ÑµÁ·×´Ì¬ÏÂmat_index=3000£¬3100£¬¡­¡­£»
 }
 
 
-void CEMG::feature_extract(Vector2D& DataMatrix, Vector1I& Label, Vector2D& FeatureRet, Vector1I& LabelRet)
+void CEMG::FeatureExtract_LDA(Vector2D& DataMatrix, Vector1I& Label, Vector2D& FeatureRet, Vector1I& LabelRet)
 {
 	FeatureRet.clear();
 	LabelRet.clear();

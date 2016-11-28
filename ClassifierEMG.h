@@ -128,7 +128,7 @@ public:
 	// 供外部使用，内部禁止调用
 	typedef std::vector<int> Vector1I;
 	typedef std::vector<std::vector<double> > Vector2D;
-	void feature_extract(Vector2D& DataMatrix, Vector1I& Label, Vector2D& FeatureRet, Vector1I& LabelRet);
+	void FeatureExtract_LDA(Vector2D& DataMatrix, Vector1I& Label, Vector2D& FeatureRet, Vector1I& LabelRet);
 
 	void SVMtrain();
 };

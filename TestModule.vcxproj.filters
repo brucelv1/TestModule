@@ -39,6 +39,9 @@
     <ClCompile Include="MathUtility.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="LDA_Bayesian.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI\ui_TestModule.h">
@@ -60,6 +63,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MathUtility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LDA_Bayesian.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

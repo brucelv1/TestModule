@@ -82,6 +82,7 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Dlg_TestModule.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MathUtility.cpp" />
     <ClCompile Include="moc_Dlg_TestModule.cpp" />
     <ClCompile Include="svm.cpp" />
   </ItemGroup>
@@ -89,7 +90,7 @@
     <ClInclude Include="Byesclassifier.h" />
     <ClInclude Include="complex.hpp" />
     <ClInclude Include="Config.h" />
-    <ClInclude Include="MathUtility.hpp" />
+    <ClInclude Include="MathUtility.h" />
     <ClInclude Include="svm.h" />
     <CustomBuild Include="Dlg_TestModule.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc.exe Dlg_TestModule.h -o moc_Dlg_TestModule.cpp</Command>

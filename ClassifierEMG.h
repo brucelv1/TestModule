@@ -2,7 +2,7 @@
 
 #include "Config.h"
 #include "svm.h"
-#include "MathUtility.hpp"
+#include "MathUtility.h"
 #include "Byesclassifier.h"
 
 #include <Windows.h>

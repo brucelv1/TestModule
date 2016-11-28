@@ -36,15 +36,15 @@
     <ClCompile Include="Byesclassifier.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MathUtility.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI\ui_TestModule.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ClassifierEMG.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MathUtility.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Byesclassifier.h">
@@ -57,6 +57,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MathUtility.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

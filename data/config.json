@@ -1,0 +1,37 @@
+{
+    "type": "Training Series",
+    "actions": [
+        {
+            "num": "1",
+            "name": "Fist",
+            "command": "31",
+            "duration": "5",
+            "sample_rate": "1000",
+            "total_sample": "5000"
+        },
+        {
+            "num": "2",
+            "name": "Rest",
+            "command": "0",
+            "duration": "5",
+            "sample_rate": "1000",
+            "total_sample": "5000"
+        },
+        {
+            "num": "3",
+            "name": "Wai Fan",
+            "command": "2048",
+            "duration": "5",
+            "sample_rate": "1000",
+            "total_sample": "5000"
+        },
+        {
+            "num": "4",
+            "name": "Rest",
+            "command": "0",
+            "duration": "5",
+            "sample_rate": "1000",
+            "total_sample": "5000"
+        }
+    ]
+}

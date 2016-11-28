@@ -15,7 +15,7 @@ enum DEVICES{EMG_NIR,BIOMETRICS,DELSYS,EMG};
 #define REST_TIME_ONLINE_TESTING   5
 
 
-#define ACTION_NUM          8    //1个trial的总动作数
+#define ACTION_NUM          4/*8*/    //1个trial的总动作数
 #define ACTION_NUM_ONLINE_TESTING  5
 
 //#define ACTION_SERIAL       {13,1,2,3,4,5,6,7,8,9,10,11,12}

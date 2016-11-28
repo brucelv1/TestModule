@@ -5,11 +5,13 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <QtGui/QMessageBox>
-#include "LDA_Bayesian.h"
 
-Dlg_TestModule::Dlg_TestModule( QWidget* parent /*= NULL*/ )
+Dlg_TestModule::Dlg_TestModule(unsigned char* nameSharedMem, size_t lenSharedMem, QWidget* parent /*= NULL*/ )
 	: QDialog(parent)
 	, _armBand(new SJTArmBand())
+	, _mLDA(new LDA_Bayesian())
+	, _ucpNameSharedMem(nameSharedMem)
+	, _stLenSharedMem(lenSharedMem)
 {
 	setupUi(this);
 }
@@ -80,9 +82,9 @@ void Dlg_TestModule::on_BtnCreateClassifier_clicked()
 		trainData.push_back(data_tmp);
 	}
 
-	LDA_Bayesian lb;
-	lb.FeatureExtract(trainData,labelVec);
-	if(lb.GenerateModel()==true)
+	
+	_mLDA->FeatureExtract(trainData,labelVec);
+	if(_mLDA->GenerateModel()==true)
 	{
 		LEClassifierStatus->setText("LDA model is generated.");
 		return;
@@ -113,7 +115,13 @@ void Dlg_TestModule::on_Btn_Connect_clicked()
 
 void Dlg_TestModule::on_Btn_StartTest_clicked()
 {
-	_mThread = boost::thread(boost::bind(&(Dlg_TestModule::_threadSend),this));
+	std::vector<int> testSeries;
+	std::vector<int> classLabel = _mLDA->GetClassVector();
+	for(int i=1; i<=spinB_ActionTimes->value(); i++)
+	{
+		testSeries.insert(testSeries.end(), classLabel.begin(), classLabel.end());
+	}
+	_mThread = boost::thread(boost::bind(&(Dlg_TestModule::_threadSend),this,testSeries));
 }
 
 void Dlg_TestModule::_parseTrainConfig()
@@ -163,7 +171,97 @@ void Dlg_TestModule::_parseTrainConfig()
 	_commandVec = InfoVec;
 }
 
-void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm )
+void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeries)
 {
+	using namespace boost::chrono;
 
+	// timing
+	duration<double> time_span;
+	steady_clock::time_point t1, t2;
+
+	// 臂带一开始不能正常读数，先等待1000ms
+	//boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+
+	// 读秒准备：3秒
+	t1 = steady_clock::now();
+	do 
+	{
+		boost::this_thread::sleep_for(boost::chrono::milliseconds(250));
+		t2 = steady_clock::now();
+		time_span = duration_cast<duration<double> > (t2-t1);
+
+		if (time_span.count() <= 1)
+			dtm->_ucpNameSharedMem[5] = 3;// set memory to 3
+		else if (time_span.count() <= 2)
+			dtm->_ucpNameSharedMem[5] = 2;// set memory to 2
+		else if (time_span.count() <= 3)
+			dtm->_ucpNameSharedMem[5] = 1;// set memory to 1
+		else
+		{
+			dtm->_ucpNameSharedMem[5] = 0;// set memory to 0
+			break;
+		}
+	} while (1);
+
+	// counting
+	int progress = 0;
+	int total_num = testSeries.size();
+		
+	for (int i=0; i<total_num; i++)
+	{
+		t1 = steady_clock::now();
+
+		int command = testSeries[i];
+		std::cout << "command: " << command << "  ";
+		int cnt = 0;
+		int right = 0;
+
+		unsigned char byte0 = command % 256;
+		unsigned char byte1 = (command >> 8) % 256;
+		unsigned char byte2 = 0; // not used yet
+		unsigned char byte3 = 0; // not used yet
+
+		// set command
+		dtm->_ucpNameSharedMem[4] = byte0;
+		dtm->_ucpNameSharedMem[3] = byte1;
+		dtm->_ucpNameSharedMem[2] = byte2; // not used yet
+		dtm->_ucpNameSharedMem[1] = byte3; // not used yet
+
+		// sampling, wait for duration
+		int sampleIdx = 0;
+		do 
+		{
+			// data query
+			if(dtm->_armBand->IsConnected())
+			{
+				dtm->_armBandData.push_back(dtm->_armBand->GetDataVector());
+			}
+
+			// 凑够了一个窗长，做一次预测
+			if (dtm->_armBandData.size() == dtm->_mLDA->_mFeaWinWidth)
+			{
+				std::vector<double> fea = dtm->_mLDA->FeatureExtractToVec(dtm->_armBandData);
+				int predict = dtm->_mLDA->Predict(fea);
+				
+				cnt++;
+				if (predict == command)
+					right++;
+
+				dtm->_armBandData.clear();
+			}
+
+			boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
+
+			t2 = steady_clock::now();
+			time_span = duration_cast<duration<double> > (t2-t1);
+			sampleIdx+=1;
+		} while (time_span.count()<6);
+
+		std::cout << "count: " << cnt << "   ";
+		std::cout << "rate: " << right*1.0 / cnt << std::endl;
+
+		progress+=1;
+		dtm->processingBarVal = 100*progress/total_num;
+	}
+	return;
 }

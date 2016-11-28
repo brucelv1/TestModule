@@ -6,6 +6,8 @@
 #include <deque>
 #include "HelperArmBand.h"
 #include <boost/thread.hpp>
+#include <QtCore/QTimer>
+#include "LDA_Bayesian.h"
 
 class Dlg_TestModule : public QDialog, public Ui_TestModule
 {
@@ -48,14 +50,25 @@ private:
 	// thread: get data, send command, ...
 	boost::thread _mThread;
 
+	// Timer, for processing bar
+	QTimer* qTimer;
+	int processingBarVal;
+
+	// classifier
+	LDA_Bayesian* _mLDA;
+
+	// Shared memory
+	unsigned char* _ucpNameSharedMem;
+	size_t _stLenSharedMem;
+
 public:
-	Dlg_TestModule(QWidget* parent = NULL);
+	Dlg_TestModule(unsigned char* nameSharedMem, size_t lenSharedMem, QWidget* parent = NULL);
 	~Dlg_TestModule();
 
 private:
 	void _parseTrainConfig();
 
-	static void _threadSend(Dlg_TestModule* dtm);
+	static void _threadSend(Dlg_TestModule* dtm, std::vector<int> testSeries);
 
 public slots:
 	void on_BtnImportConfig_clicked();

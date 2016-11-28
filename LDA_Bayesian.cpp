@@ -30,12 +30,9 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 		return false;
 	}
 	//unique label of labels
-	vector<int> unilabel;
-	for(int i=0;i<lab_num;i++)
-		unilabel.push_back(label[i]);
-
-	sort(unilabel.begin(), unilabel.end());
-	unilabel.erase(unique(unilabel.begin(), unilabel.end()), unilabel.end());
+	_mClassLabel = label;
+	sort(_mClassLabel.begin(), _mClassLabel.end());
+	_mClassLabel.erase(unique(_mClassLabel.begin(), _mClassLabel.end()), _mClassLabel.end());
 
 	//Eigen matrix class
 	MatrixXd featmat(feat_num,feat_dim);
@@ -47,7 +44,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 		}
 	}
 	//number of classes
-	int cnum = unilabel.size();
+	int cnum = _mClassLabel.size();
 	// mean matrix and covariance matrix for each class
 	MatrixXd MeanMat = MatrixXd::Zero(cnum,feat_dim);
 	MatrixXd CovMat = MatrixXd::Zero(feat_dim*cnum,feat_dim);
@@ -60,7 +57,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 	{
 		for(int j=0;j<cnum;j++)
 		{
-			if(label[i]==unilabel[j])
+			if(label[i]==_mClassLabel[j])
 			{
 				MeanMat.row(j)=MeanMat.row(j)+ featmat.row(i);
 				feat_num_perclass(j) = feat_num_perclass(j)+1;
@@ -76,7 +73,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 	{
 		for(int j=0;j<cnum;j++)
 		{
-			if(label[i]==unilabel[j])
+			if(label[i]==_mClassLabel[j])
 			{
 				CovMat.block(j*feat_dim,0,feat_dim,feat_dim) += (featmat.row(i)-MeanMat.row(j)).transpose()*(featmat.row(i)-MeanMat.row(j));
 			}
@@ -329,5 +326,79 @@ void LDA_Bayesian::FeatureExtract(Vector2D& DataMatrix, Vector1I& Label)
 bool LDA_Bayesian::GenerateModel()
 {
 	return Bayestrain(_mFeatureMatrix, _mLabelVector);
+}
+
+vector<int> LDA_Bayesian::GetClassVector()
+{
+	return _mClassLabel;
+}
+
+int LDA_Bayesian::Predict( vector<double>& x )
+{
+	return Bayespredict(_mModelCov, _mModelMean, x);
+}
+
+std::vector<double> LDA_Bayesian::FeatureExtractToVec( Vector2D& DataMatrix )
+{
+	vector<double> fea_temp;
+	for (size_t smp_idx=0; smp_idx<DataMatrix.size(); smp_idx += _mFeaWinWidth)
+	{
+		fea_temp.resize(_mFeaDimension);
+		int channel_index;
+
+		// feature TD
+		// 3 features: fea0-绝对值之和, fea1-过零点数, fea2-波长, fea3-导数拐点
+		for(int i=0;i<4;i++)//LB// _mChannelNum=8 here
+		{
+			channel_index = i; // 1 2 3 4
+			fea_temp[i*4]=0;fea_temp[i*4+1]=0;fea_temp[i*4+2]=0;fea_temp[i*4+3]=0;			
+			for(int j=0;j<_mFeaWinWidth;j++)
+			{
+				// _mFeaWinWidth数据窗中的数据，j0是当前采样，j1是上一次采样，j2是再前一次采样;
+				int j0 = smp_idx+j;
+				int j1 = j0-1;
+				int j2 = j0-2;
+
+				//fea0// fea_temp[0 4 8……]位上分别是0 1 2通道上前(_mFeaWinWidth)个数据绝对值的和
+				fea_temp[i*4]+=abs(DataMatrix[j0][channel_index]);
+				if(j>0)
+				{
+					//fea1// fea_temp[1 5 9……]位上分别是0 1 2通道上前(_mFeaWinWidth)个数据相邻两个相乘是否大于0的状态的总和
+					fea_temp[i*4+1]+=int(DataMatrix[j0][channel_index]*DataMatrix[j1][channel_index]>0);
+					//fea2// fea_temp[2 6 10……]位上分别是0 1 2通道上前(_mFeaWinWidth)个数据相邻两个之差的绝对值的总和
+					fea_temp[i*4+2]+=abs(DataMatrix[j0][channel_index]-DataMatrix[j1][channel_index]);
+				}
+				if(j>1)
+				{
+					//fea3// fea_temp[3 8 11……]位上分别是0 1 2通道上前(_mFeaWinWidth)个数据相邻两个数据之差的乘积是否大于0的状态的总和
+					fea_temp[i*4+3]+=int((DataMatrix[j0][channel_index]-DataMatrix[j1][channel_index])*(DataMatrix[j1][channel_index]-DataMatrix[j2][channel_index])>0);
+				}
+			}
+		}
+
+		// feature NIR -- I do not care
+		for(int i=4;i<_mChannelNum;i++)//LB// _mChannelNum=8 here
+		{
+			channel_index = i; // 5 6 7 8
+			fea_temp[4*4+(i-4)*2]=0;fea_temp[4*4+(i-4)*2+1]=0;			
+			for(int j=0;j<_mFeaWinWidth;j++)
+			{
+				// _mFeaWinWidth数据窗中的数据，j0是当前采样，j1是上一次采样;
+				int j0 = smp_idx+j;
+				int j1 = j0-1;
+
+				//fea0// fea_temp[16 18 20 22]位上分别是5 6 7 8通道上前(_mFeaWinWidth)个数据绝对值的和
+				fea_temp[4*4+(i-4)*2]+=DataMatrix[j0][channel_index];   
+				if(j>0)
+				{
+					//fea2// fea_temp[17 19 21 23]位上分别是5 6 7 8通道上前(_mFeaWinWidth)个数据相邻两个之差的绝对值的总和
+					fea_temp[4*4+(i-4)*2+1]+=abs(DataMatrix[j0][channel_index]-DataMatrix[j1][channel_index]);
+				}
+
+			}
+			fea_temp[4*4+(i-4)*2]=fea_temp[4*4+(i-4)*2]/_mFeaWinWidth;
+		}	
+	}
+	return fea_temp;
 }
 

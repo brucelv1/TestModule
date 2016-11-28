@@ -115,6 +115,7 @@ public:
         spinB_ActionTimes = new QSpinBox(groupBox_2);
         spinB_ActionTimes->setObjectName(QString::fromUtf8("spinB_ActionTimes"));
         spinB_ActionTimes->setGeometry(QRect(140, 30, 42, 22));
+        spinB_ActionTimes->setMinimum(1);
         spinB_ActionTimes->setMaximum(99);
         label_3 = new QLabel(groupBox_2);
         label_3->setObjectName(QString::fromUtf8("label_3"));

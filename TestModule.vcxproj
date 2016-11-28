@@ -59,6 +59,10 @@
       <AdditionalDependencies>QtCored4.lib;QtGuid4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>16000000</StackReserveSize>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -83,12 +87,10 @@
     <ClCompile Include="LDA_Bayesian.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="moc_Dlg_TestModule.cpp" />
-    <ClCompile Include="svm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HelperArmBand.h" />
     <ClInclude Include="LDA_Bayesian.h" />
-    <ClInclude Include="svm.h" />
     <CustomBuild Include="Dlg_TestModule.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc.exe Dlg_TestModule.h -o moc_Dlg_TestModule.cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc_Dlg_TestModule.cpp</Outputs>

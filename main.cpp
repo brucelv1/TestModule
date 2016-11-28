@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	mem[0]+=1;
 
 	QApplication qapp(argc, argv);
-	Dlg_TestModule dtm;
+	Dlg_TestModule dtm(mem,len);
 	dtm.setModal(false);
 	dtm.show();
 	qapp.exec();

@@ -6,6 +6,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <QtGui/QMessageBox>
 #include <QtCore/QString>
+#include <algorithm>
 
 Dlg_TestModule::Dlg_TestModule(unsigned char* nameSharedMem, size_t lenSharedMem, QWidget* parent /*= NULL*/ )
 	: QDialog(parent)
@@ -121,6 +122,7 @@ void Dlg_TestModule::on_Btn_Connect_clicked()
 
 void Dlg_TestModule::on_Btn_StartTest_clicked()
 {
+	// initiate processing bar and start timer
 	processingBarVal = 0;
 	if(qTimer->isActive())
 		qTimer->stop();
@@ -128,13 +130,16 @@ void Dlg_TestModule::on_Btn_StartTest_clicked()
 
 	_mSingleDuration=spinB_ActionDuration->value();
 
+	// generate test series and shuffle it
 	std::vector<int> testSeries;
 	std::vector<int> classLabel = _mLDA->GetClassVector();
 	for(int i=1; i<=spinB_ActionTimes->value(); i++)
 	{
 		testSeries.insert(testSeries.end(), classLabel.begin(), classLabel.end());
-		// need shuffle here
 	}
+	// shuffle
+	std::random_shuffle(testSeries.begin(), testSeries.end());
+
 	_mThread = boost::thread(boost::bind(&(Dlg_TestModule::_threadSend),this,testSeries));
 }
 
@@ -196,27 +201,6 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 	// 臂带一开始不能正常读数，先等待1000ms
 	//boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
 
-	// 读秒准备：3秒
-	t1 = steady_clock::now();
-	do 
-	{
-		boost::this_thread::sleep_for(boost::chrono::milliseconds(250));
-		t2 = steady_clock::now();
-		time_span = duration_cast<duration<double> > (t2-t1);
-
-		if (time_span.count() <= 1)
-			std::cout << "3 ";//dtm->_ucpNameSharedMem[5] = 3;// set memory to 3
-		else if (time_span.count() <= 2)
-			std::cout << "2 ";//dtm->_ucpNameSharedMem[5] = 2;// set memory to 2
-		else if (time_span.count() <= 3)
-			std::cout << "1 ";//dtm->_ucpNameSharedMem[5] = 1;// set memory to 1
-		else
-		{
-			std::cout << "0\n";//dtm->_ucpNameSharedMem[5] = 0;// set memory to 0
-			break;
-		}
-	} while (1);
-
 	// counting
 	int progress = 0;
 	int total_num = testSeries.size();
@@ -224,28 +208,64 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 	// testing series
 	for (int i=0; i<total_num; i++)
 	{
-		t1 = steady_clock::now();
-
+		// get command
 		int command = testSeries[i];
 		std::cout << "command: " << command << "  ";
+		// parse command
+		unsigned char byte0 = command % 256;
+		unsigned char byte1 = (command >> 8) % 256;
+		unsigned char byte2 = 0; // not used yet
+		unsigned char byte3 = 0; // not used yet
+		// write shared memory
+		dtm->_ucpNameSharedMem[4] = byte0;
+		dtm->_ucpNameSharedMem[3] = byte1;
+		dtm->_ucpNameSharedMem[2] = byte2; // not used yet
+		dtm->_ucpNameSharedMem[1] = byte3; // not used yet
+
+		// main module processing bar
+		unsigned char main_module_processing = 0;
+		dtm->_ucpNameSharedMem[6] = main_module_processing;
+
+		// 读秒准备：3秒
+		t1 = steady_clock::now();
+		do 
+		{
+			boost::this_thread::sleep_for(boost::chrono::milliseconds(250));
+			t2 = steady_clock::now();
+			time_span = duration_cast<duration<double> > (t2-t1);
+
+			if (time_span.count() <= 1)
+			{
+				std::cout << "3 ";
+				//dtm->_ucpNameSharedMem[5] = 3;// set memory to 3
+			}
+			else if (time_span.count() <= 2)
+			{
+				std::cout << "2 ";
+				//dtm->_ucpNameSharedMem[5] = 2;// set memory to 2
+			}
+			else if (time_span.count() <= 3)
+			{
+				std::cout << "1 ";
+				//dtm->_ucpNameSharedMem[5] = 1;// set memory to 1
+			}
+			else
+			{
+				std::cout << "0\n";
+				//dtm->_ucpNameSharedMem[5] = 0;// set memory to 0
+				break;
+			}
+		} while (1);
+		
+		// statistics
 		int cnt = 0;
 		int right = 0;
 		int firstHit = 0;
 		bool has1stHit = false;
 		int rightAfterFirst = 0;
 
-		unsigned char byte0 = command % 256;
-		unsigned char byte1 = (command >> 8) % 256;
-		unsigned char byte2 = 0; // not used yet
-		unsigned char byte3 = 0; // not used yet
-
-		// set command
-		dtm->_ucpNameSharedMem[4] = byte0;
-		dtm->_ucpNameSharedMem[3] = byte1;
-		dtm->_ucpNameSharedMem[2] = byte2; // not used yet
-		dtm->_ucpNameSharedMem[1] = byte3; // not used yet
-
 		// sampling, wait for duration
+		t1 = steady_clock::now();
 		int sampleIdx = 0;
 		do 
 		{
@@ -280,6 +300,9 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 			t2 = steady_clock::now();
 			time_span = duration_cast<duration<double> > (t2-t1);
 			sampleIdx+=1;
+			// update main module
+			main_module_processing = 100 * time_span.count() / dtm->_mSingleDuration;
+			dtm->_ucpNameSharedMem[6] = main_module_processing;
 		} while (time_span.count() < dtm->_mSingleDuration);
 
 		std::cout << "count: " << cnt << "   ";
@@ -372,4 +395,6 @@ void Dlg_TestModule::_initTableView()
 void Dlg_TestModule::_qTimer_timeout()
 {
 	progressBar->setValue(processingBarVal);
+	//std::cout << "process: " << _ucpNameSharedMem[6] << std::endl;
+	//progressBar->setValue(_ucpNameSharedMem[6]);
 }

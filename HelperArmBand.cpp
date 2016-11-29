@@ -382,10 +382,8 @@ bool SJTArmBand::SendData_EMG()
 				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]+=double(buff[index]); //LB//低八位存储，与高八位的数据相加
 				if(data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]>=65534/2)   //LB//2^16=65536  
 					data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]-=65535;
-				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]-=1862;//减去基线1.5V：1.5*4096/3.3        //LB//2^12=4096    计算？
-				if((data_cnt_count%(DATA_CHANNEL*2)/2) < 4)
-					data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]=mFilter.DoFilter(data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]);    //LB//前8位数据为EMG信号，需要滤波
-			}                                         //LB//data_buff[0,1,2,3]=滤波后的4通道EMG信号
+				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]=mFilter.DoFilter(data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]);
+			}
 			data_cnt_count++;
 			if(data_cnt_count==data_cnt_max)
 				data_cnt_state++;

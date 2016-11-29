@@ -23,6 +23,8 @@
 #include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
 #include <QtGui/QSpinBox>
+#include <QtGui/QTableView>
+#include <QtGui/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
 
@@ -44,16 +46,25 @@ public:
     QLabel *label_2;
     QLineEdit *LE_Armband_Status;
     QGroupBox *groupBox_2;
-    QSpinBox *spinB_ActionTimes;
+    QHBoxLayout *horizontalLayout_4;
+    QHBoxLayout *horizontalLayout_3;
     QLabel *label_3;
+    QSpinBox *spinB_ActionTimes;
+    QLabel *label_4;
+    QSpinBox *spinB_ActionDuration;
     QPushButton *Btn_StartTest;
     QProgressBar *progressBar;
+    QGroupBox *groupBox_3;
+    QHBoxLayout *horizontalLayout_5;
+    QVBoxLayout *verticalLayout;
+    QTableView *tbView_Report;
+    QPushButton *Btn_CreateReport;
 
     void setupUi(QDialog *TestModule)
     {
         if (TestModule->objectName().isEmpty())
             TestModule->setObjectName(QString::fromUtf8("TestModule"));
-        TestModule->resize(445, 468);
+        TestModule->resize(413, 622);
         BtnImportConfig = new QPushButton(TestModule);
         BtnImportConfig->setObjectName(QString::fromUtf8("BtnImportConfig"));
         BtnImportConfig->setGeometry(QRect(10, 20, 121, 31));
@@ -112,21 +123,64 @@ public:
         groupBox_2 = new QGroupBox(TestModule);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
         groupBox_2->setGeometry(QRect(10, 250, 391, 81));
-        spinB_ActionTimes = new QSpinBox(groupBox_2);
-        spinB_ActionTimes->setObjectName(QString::fromUtf8("spinB_ActionTimes"));
-        spinB_ActionTimes->setGeometry(QRect(140, 30, 42, 22));
-        spinB_ActionTimes->setMinimum(1);
-        spinB_ActionTimes->setMaximum(99);
+        horizontalLayout_4 = new QHBoxLayout(groupBox_2);
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         label_3 = new QLabel(groupBox_2);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(20, 30, 101, 31));
+
+        horizontalLayout_3->addWidget(label_3);
+
+        spinB_ActionTimes = new QSpinBox(groupBox_2);
+        spinB_ActionTimes->setObjectName(QString::fromUtf8("spinB_ActionTimes"));
+        spinB_ActionTimes->setMinimum(1);
+        spinB_ActionTimes->setMaximum(99);
+
+        horizontalLayout_3->addWidget(spinB_ActionTimes);
+
+        label_4 = new QLabel(groupBox_2);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+
+        horizontalLayout_3->addWidget(label_4);
+
+        spinB_ActionDuration = new QSpinBox(groupBox_2);
+        spinB_ActionDuration->setObjectName(QString::fromUtf8("spinB_ActionDuration"));
+        spinB_ActionDuration->setMinimum(5);
+        spinB_ActionDuration->setMaximum(99);
+
+        horizontalLayout_3->addWidget(spinB_ActionDuration);
+
+
+        horizontalLayout_4->addLayout(horizontalLayout_3);
+
         Btn_StartTest = new QPushButton(TestModule);
         Btn_StartTest->setObjectName(QString::fromUtf8("Btn_StartTest"));
-        Btn_StartTest->setGeometry(QRect(10, 360, 81, 31));
+        Btn_StartTest->setGeometry(QRect(10, 340, 81, 31));
         progressBar = new QProgressBar(TestModule);
         progressBar->setObjectName(QString::fromUtf8("progressBar"));
-        progressBar->setGeometry(QRect(110, 360, 331, 31));
+        progressBar->setGeometry(QRect(100, 340, 301, 31));
         progressBar->setValue(0);
+        groupBox_3 = new QGroupBox(TestModule);
+        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
+        groupBox_3->setGeometry(QRect(10, 380, 391, 221));
+        horizontalLayout_5 = new QHBoxLayout(groupBox_3);
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        tbView_Report = new QTableView(groupBox_3);
+        tbView_Report->setObjectName(QString::fromUtf8("tbView_Report"));
+
+        verticalLayout->addWidget(tbView_Report);
+
+        Btn_CreateReport = new QPushButton(groupBox_3);
+        Btn_CreateReport->setObjectName(QString::fromUtf8("Btn_CreateReport"));
+
+        verticalLayout->addWidget(Btn_CreateReport);
+
+
+        horizontalLayout_5->addLayout(verticalLayout);
+
 
         retranslateUi(TestModule);
 
@@ -157,7 +211,10 @@ public:
         label_2->setText(QApplication::translate("TestModule", "\350\277\236\346\216\245\347\212\266\346\200\201\357\274\232", 0, QApplication::UnicodeUTF8));
         groupBox_2->setTitle(QApplication::translate("TestModule", "\346\265\213\350\257\225\347\233\270\345\205\263\350\256\276\347\275\256", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("TestModule", "\346\257\217\344\270\252\345\212\250\344\275\234\351\207\215\345\244\215\346\254\241\346\225\260", 0, QApplication::UnicodeUTF8));
+        label_4->setText(QApplication::translate("TestModule", "\345\212\250\344\275\234\346\214\201\347\273\255\346\227\266\351\227\264", 0, QApplication::UnicodeUTF8));
         Btn_StartTest->setText(QApplication::translate("TestModule", "\345\274\200\345\247\213\346\265\213\350\257\225", 0, QApplication::UnicodeUTF8));
+        groupBox_3->setTitle(QApplication::translate("TestModule", "\346\265\213\350\257\225\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
+        Btn_CreateReport->setText(QApplication::translate("TestModule", "\347\224\237\346\210\220\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

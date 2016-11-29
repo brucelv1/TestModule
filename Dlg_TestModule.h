@@ -8,6 +8,9 @@
 #include <boost/thread.hpp>
 #include <QtCore/QTimer>
 #include "LDA_Bayesian.h"
+#include <QtGui/QAbstractItemView>
+#include <QtGui/QStandardItemModel>
+#include <QtGui/QStandardItem>
 
 class Dlg_TestModule : public QDialog, public Ui_TestModule
 {
@@ -49,6 +52,9 @@ private:
 
 	// thread: get data, send command, ...
 	boost::thread _mThread;
+	// single action duration, in second, used in thread
+	// default: 6s
+	size_t _mSingleDuration;
 
 	// Timer, for processing bar
 	QTimer* qTimer;
@@ -61,6 +67,19 @@ private:
 	unsigned char* _ucpNameSharedMem;
 	size_t _stLenSharedMem;
 
+	// Statistics
+	// 1 每个动作对应的总预测次数 <command, predict>
+	std::vector< std::pair<int, int> > _predictPerAction;
+	// 2 每个动作正确的预测次数
+	std::vector<int> _rightPrdtPerAction;
+	// 3 第一次预测正确对应的时间延迟
+	std::vector<int> _firstHitDelay;
+	// 4 第一次预测正确后，动作保持准确率
+	std::vector<float> _holdStability;
+
+	// Table model
+	QStandardItemModel* _tableModel;
+
 public:
 	Dlg_TestModule(unsigned char* nameSharedMem, size_t lenSharedMem, QWidget* parent = NULL);
 	~Dlg_TestModule();
@@ -70,12 +89,18 @@ private:
 
 	static void _threadSend(Dlg_TestModule* dtm, std::vector<int> testSeries);
 
+	void _initTableView();
+
 public slots:
 	void on_BtnImportConfig_clicked();
 	void on_BtnImportData_clicked();
 	void on_BtnCreateClassifier_clicked();
 	void on_Btn_Connect_clicked();
 	void on_Btn_StartTest_clicked();
+	void on_Btn_CreateReport_clicked();
+
+private slots:
+	void _qTimer_timeout();
 };
 
 #endif // _DLG_TEST_MODULE_

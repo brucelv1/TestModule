@@ -5,6 +5,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <QtGui/QMessageBox>
+#include <QtCore/QString>
 
 Dlg_TestModule::Dlg_TestModule(unsigned char* nameSharedMem, size_t lenSharedMem, QWidget* parent /*= NULL*/ )
 	: QDialog(parent)
@@ -12,8 +13,13 @@ Dlg_TestModule::Dlg_TestModule(unsigned char* nameSharedMem, size_t lenSharedMem
 	, _mLDA(new LDA_Bayesian())
 	, _ucpNameSharedMem(nameSharedMem)
 	, _stLenSharedMem(lenSharedMem)
+	, _tableModel(new QStandardItemModel(this))
+	, _mSingleDuration(6)
 {
 	setupUi(this);
+	_initTableView();
+	qTimer = new QTimer(this);
+	connect(qTimer, SIGNAL(timeout()), this, SLOT(_qTimer_timeout()));
 }
 
 Dlg_TestModule::~Dlg_TestModule()
@@ -115,11 +121,19 @@ void Dlg_TestModule::on_Btn_Connect_clicked()
 
 void Dlg_TestModule::on_Btn_StartTest_clicked()
 {
+	processingBarVal = 0;
+	if(qTimer->isActive())
+		qTimer->stop();
+	qTimer->start(200);
+
+	_mSingleDuration=spinB_ActionDuration->value();
+
 	std::vector<int> testSeries;
 	std::vector<int> classLabel = _mLDA->GetClassVector();
 	for(int i=1; i<=spinB_ActionTimes->value(); i++)
 	{
 		testSeries.insert(testSeries.end(), classLabel.begin(), classLabel.end());
+		// need shuffle here
 	}
 	_mThread = boost::thread(boost::bind(&(Dlg_TestModule::_threadSend),this,testSeries));
 }
@@ -191,14 +205,14 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 		time_span = duration_cast<duration<double> > (t2-t1);
 
 		if (time_span.count() <= 1)
-			dtm->_ucpNameSharedMem[5] = 3;// set memory to 3
+			std::cout << "3 ";//dtm->_ucpNameSharedMem[5] = 3;// set memory to 3
 		else if (time_span.count() <= 2)
-			dtm->_ucpNameSharedMem[5] = 2;// set memory to 2
+			std::cout << "2 ";//dtm->_ucpNameSharedMem[5] = 2;// set memory to 2
 		else if (time_span.count() <= 3)
-			dtm->_ucpNameSharedMem[5] = 1;// set memory to 1
+			std::cout << "1 ";//dtm->_ucpNameSharedMem[5] = 1;// set memory to 1
 		else
 		{
-			dtm->_ucpNameSharedMem[5] = 0;// set memory to 0
+			std::cout << "0\n";//dtm->_ucpNameSharedMem[5] = 0;// set memory to 0
 			break;
 		}
 	} while (1);
@@ -206,7 +220,8 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 	// counting
 	int progress = 0;
 	int total_num = testSeries.size();
-		
+	
+	// testing series
 	for (int i=0; i<total_num; i++)
 	{
 		t1 = steady_clock::now();
@@ -215,6 +230,9 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 		std::cout << "command: " << command << "  ";
 		int cnt = 0;
 		int right = 0;
+		int firstHit = 0;
+		bool has1stHit = false;
+		int rightAfterFirst = 0;
 
 		unsigned char byte0 = command % 256;
 		unsigned char byte1 = (command >> 8) % 256;
@@ -245,7 +263,14 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 				
 				cnt++;
 				if (predict == command)
+				{
+					if (has1stHit==false)
+					{
+						firstHit = cnt;
+						has1stHit = true;
+					}
 					right++;
+				}
 
 				dtm->_armBandData.clear();
 			}
@@ -255,13 +280,96 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 			t2 = steady_clock::now();
 			time_span = duration_cast<duration<double> > (t2-t1);
 			sampleIdx+=1;
-		} while (time_span.count()<6);
+		} while (time_span.count() < dtm->_mSingleDuration);
 
 		std::cout << "count: " << cnt << "   ";
 		std::cout << "rate: " << right*1.0 / cnt << std::endl;
+
+		// statistics
+		dtm->_predictPerAction.push_back(std::make_pair(command, cnt));
+		dtm->_rightPrdtPerAction.push_back(right);
+		dtm->_firstHitDelay.push_back((firstHit-1)*(dtm->_mLDA->_mFeaWinWidth));
+		dtm->_holdStability.push_back(right*1.0/(cnt-firstHit+1));
 
 		progress+=1;
 		dtm->processingBarVal = 100*progress/total_num;
 	}
 	return;
+}
+
+void Dlg_TestModule::on_Btn_CreateReport_clicked()
+{
+	if (_predictPerAction.empty())
+	{
+		return;
+	}
+
+	// clear table
+	int nRow = _tableModel->rowCount();
+	for (int i=nRow-1;i>=0;i--)
+	{
+		_tableModel->removeRow(i);
+	}
+
+	// update table
+	// then fill the table
+	
+	for (size_t i=0; i<_predictPerAction.size(); i++)
+	{
+		// name
+		int command = _predictPerAction[i].first;
+		std::string name = "";
+		for (size_t j=0; j<_commandVec.size(); j++)
+		{
+			if(_commandVec[j]->Command == command)
+			{
+				name = _commandVec[j]->Name;
+				break;
+			}
+		}
+		_tableModel->setItem(i,0,new QStandardItem(QString(name.c_str())));
+
+		// correctness
+		float temp = _rightPrdtPerAction[i];
+		temp /= _predictPerAction[i].second;
+		char buff[20];
+		sprintf_s(buff,"%.4f%%", temp*100);
+		QString crct = QString(buff);
+		_tableModel->setItem(i,1,new QStandardItem(crct));
+
+		// fisrt hit delay
+		int delayedSamples = _firstHitDelay[i];
+		QString fhd;
+		if(delayedSamples<0)
+			fhd = QString("No Hits");
+		else
+			fhd = QString(delayedSamples);
+		_tableModel->setItem(i,2,new QStandardItem(fhd));
+
+		// stability
+		temp = _holdStability[i];
+		sprintf_s(buff,"%.4f%%", temp*100);
+		QString stb = QString(buff);
+		_tableModel->setItem(i,3,new QStandardItem(stb));
+	}
+
+}
+
+void Dlg_TestModule::_initTableView()
+{
+	_tableModel->setHorizontalHeaderItem(0,new QStandardItem("Name"));
+	_tableModel->setHorizontalHeaderItem(1,new QStandardItem("Correctness"));
+	_tableModel->setHorizontalHeaderItem(2,new QStandardItem("First Hit Delay"));
+	_tableModel->setHorizontalHeaderItem(3,new QStandardItem("Stability"));
+
+	// bind the model with the view
+	tbView_Report->setModel(_tableModel);
+
+	// set read-only
+	tbView_Report->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+void Dlg_TestModule::_qTimer_timeout()
+{
+	progressBar->setValue(processingBarVal);
 }

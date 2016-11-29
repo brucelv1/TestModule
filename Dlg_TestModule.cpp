@@ -366,7 +366,11 @@ void Dlg_TestModule::on_Btn_CreateReport_clicked()
 		if(delayedSamples<0)
 			fhd = QString("No Hits");
 		else
-			fhd = QString(delayedSamples);
+		{
+			char buff[20];
+			sprintf_s(buff,"%d samples", delayedSamples);
+			fhd = QString(buff);
+		}
 		_tableModel->setItem(i,2,new QStandardItem(fhd));
 
 		// stability

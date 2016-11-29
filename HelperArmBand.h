@@ -8,11 +8,7 @@ Description:定义了CFilter、SJTArmBand类，完成从串口读数据、滤波功能
 #include <Windows.h>
 #include <vector>
 
-//LB//EMG&NIR接收数据线程，每个线程里做打开串口、发送数据、关闭串口的动作。
-//LB//EMG&NIR臂带接收数据线程
-static DWORD WINAPI DataThreadEntry(PVOID arg);
-
-//LB//EMG臂带接收数据线程
+// EMG臂带接收数据线程，打开串口、发送数据、关闭串口的动作。
 static DWORD WINAPI DataThreadEntry_EMG(PVOID arg);
 
 enum STATE {REST=1,START,END};
@@ -93,12 +89,11 @@ public:
 	}
 	
 	/*******************************************
-	函数名称：SendData
-	功    能：读取EMG&NIR臂带串口数据，滤波、校验，调用SetData函数传送、存储数据
+	函数名称：SendData_EMG
+	功    能：读取EMG臂带串口数据，滤波、校验、存储数据
 	参    数：无       
 	返回值  ：无
-	********************************************/
-	bool SendData();	
+	********************************************/	
 	bool SendData_EMG();
 
 	std::vector<double> GetDataVector(); 

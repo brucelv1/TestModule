@@ -4,20 +4,6 @@
 /*******************************************
 静态全局函数: BEGIN
 ********************************************/
-static DWORD WINAPI DataThreadEntry(PVOID arg) 
-{
-	//((SJTArmBand *)arg)->OpenSerial();
-	//while(((SJTArmBand *)arg)->thread_state!=END)
-	//{
-	//	if(((SJTArmBand *)arg)->mSerialSuccessful)
-	//		((SJTArmBand *)arg)->SendData();
-	//	else
-	//		((SJTArmBand *)arg)->thread_state=END;
-	//}
-	//((SJTArmBand *)arg)->CloseSerial();
-	return 0;
-}
-
 // 默认使用的数据更新线程
 static DWORD WINAPI DataThreadEntry_EMG(PVOID arg) 
 {
@@ -256,7 +242,7 @@ bool SJTArmBand::Connect(int _nCOM/*=5*/, int _BaudRate/*=57600*/)
 	{
 	case EMG_NIR:
 		thread_state=REST;
-		m_hThread=CreateThread(NULL,0,DataThreadEntry,(PVOID)this,0,NULL);
+		//m_hThread=CreateThread(NULL,0,DataThreadEntry,(PVOID)this,0,NULL);
 		break;
 
 	case EMG:
@@ -276,78 +262,6 @@ bool SJTArmBand::Connect(int _nCOM/*=5*/, int _BaudRate/*=57600*/)
 	}
 	else
 		return true;
-}
-
-bool SJTArmBand::SendData()
-{
-	DWORD BytesRead;                               // the number of bytes that have been read
-	::ReadFile(hCom,buff,3000,&BytesRead,NULL);    //LB//从文件指针指向的位置开始将数据读出到一个文件中,buff为保存读入数据的缓冲区。3000要读入的字节数。
-	for(DWORD index=0; index<BytesRead; index++)
-	{
-		switch(data_cnt_state)              //LB//数据状态
-		{
-		case 0:
-			if(buff[index]==0x55)           //LB//许多串口通讯中测试或握手信号使用AA或55这两个特殊的十六进制数
-				data_cnt_state++;           
-			break;
-		case 1:
-			if(buff[index]==0xAA)           //LB//AA展开为10101010,55展开为01010101,变成串行电平的话就是一个占空比为50%的方波
-			{                               //LB//这种方波在电路中最容易被分辨是否受干扰或者畸变，在实际波形的观察中也最容易看出毛病所在
-				data_cnt_state++;
-				data_cnt_count=0;           //LB//数据计数
-				data_cnt_max=16;
-				data_cnt_check=0;           //LB//数据校验
-			}
-			else
-				data_cnt_state=0;
-			break;
-		case 2:
-			data_cnt_check+=buff[index];
-			if(data_cnt_count%2==0)//每两个数据存储一次（一个数据分高低两位传输）
-				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]=double(buff[index]*256);//LB//高八位存储,乘256复原    %与/同级，从左往右
-			else
-			{
-				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]+=double(buff[index]); //LB//低八位存储，与高八位的数据相加
-				if(data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]>=65534/2)   //LB//2^16=65536  
-					data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]-=65535;
-				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]-=1862;//减去基线1.5V：1.5*4096/3.3        //LB//2^12=4096    计算？
-				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]=mFilter.DoFilter(data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]);    //LB//前8位数据为EMG信号，需要滤波
-			}                                         //LB//data_buff[0,1,2,3]=滤波后的4通道EMG信号
-			data_cnt_count++;
-			if(data_cnt_count==data_cnt_max/2)
-				data_cnt_state++;
-			break;
-		case 3:
-			data_cnt_check+=buff[index];
-			if(data_cnt_count%2==0)//每两个数据存储一次（一个数据分高低两位传输）
-				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]=double(buff[index]*256);//高八位存储
-			else
-			{
-				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]+=double(buff[index]);//低八位存储
-				if(data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]>=65534/2)
-					data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]-=65535;
-				data_buff[data_cnt_count%(DATA_CHANNEL*2)/2]/=10.0; //把近红外的幅值除以10
-			}
-			data_cnt_count++;
-			if(data_cnt_count==data_cnt_max)
-				data_cnt_state++;
-			break;
-		case 4:
-			if(data_cnt_check%256==buff[index])    //LB//校验正确，调用SetData()函数，将读得的数据写入EMG成员中
-			{
-				EnterCriticalSection(&_mCriticalSection);
-				for (int i=0; i<DATA_CHANNEL; i++)
-				{
-					_mDataReadyToUse[i] = data_buff[i];
-				}
-				LeaveCriticalSection(&_mCriticalSection);
-			}
-			data_cnt_state=0;						
-			break;
-		}
-	}
-	Sleep(1);//交出CPU的占用权，使CPU可以调度其他线程
-	return false;
 }
 
 bool SJTArmBand::SendData_EMG()

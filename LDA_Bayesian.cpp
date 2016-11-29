@@ -6,7 +6,7 @@
 LDA_Bayesian::LDA_Bayesian()
 {
 	_mFeaWinWidth = 200;
-	_mFeaDimension = 24;
+	_mFeaDimension = 32;
 	_mChannelNum = 8;
 }
 LDA_Bayesian::~LDA_Bayesian()
@@ -187,14 +187,14 @@ int LDA_Bayesian::Bayespredict(vector<vector<double> >& PoolCovMat, vector<vecto
 		if(i==0)
 		{
 			mingx = gx;
-			predict = i;
+			predict = _mClassLabel[i];
 		}
 		else
 		{
 			if(gx<mingx)
 			{
 				mingx=gx;
-				predict = i;
+				predict = _mClassLabel[i];
 			}
 		}
 	}
@@ -214,12 +214,11 @@ void LDA_Bayesian::FeatureExtract(Vector2D& DataMatrix, Vector1I& Label)
 		fea_temp.resize(_mFeaDimension);
 		int channel_index;
 
-
 		// feature TD
-		// 3 features: fea0-绝对值之和, fea1-过零点数, fea2-波长, fea3-导数拐点
-		for(int i=0;i<4;i++)//LB// _mChannelNum=8 here
+		// 4 features: fea0-绝对值之和, fea1-过零点数, fea2-波长, fea3-导数拐点
+		for(int i=0;i<_mChannelNum;i++)//LB// _mChannelNum=8 here
 		{
-			channel_index = i; // 1 2 3 4
+			channel_index = i;
 			fea_temp[i*4]=0;fea_temp[i*4+1]=0;fea_temp[i*4+2]=0;fea_temp[i*4+3]=0;			
 			for(int j=0;j<_mFeaWinWidth;j++)
 			{
@@ -251,91 +250,10 @@ void LDA_Bayesian::FeatureExtract(Vector2D& DataMatrix, Vector1I& Label)
 				}
 			}
 		}
-
-		// feature NIR -- I do not care
-		for(int i=4;i<_mChannelNum;i++)//LB// _mChannelNum=8 here
-		{
-			channel_index = i; // 5 6 7 8
-			fea_temp[4*4+(i-4)*2]=0;fea_temp[4*4+(i-4)*2+1]=0;			
-			for(int j=0;j<_mFeaWinWidth;j++)
-			{
-				// _mFeaWinWidth数据窗中的数据，j0是当前采样，j1是上一次采样;
-				int j0 = smp_idx+j;
-				int j1 = j0-1;
-
-				//fea0// fea_temp[16 18 20 22]位上分别是5 6 7 8通道上前(_mFeaWinWidth)个数据绝对值的和
-				fea_temp[4*4+(i-4)*2]+=DataMatrix[j0][channel_index];   
-				if(j>0)
-				{
-					//fea2// fea_temp[17 19 21 23]位上分别是5 6 7 8通道上前(_mFeaWinWidth)个数据相邻两个之差的绝对值的总和
-					fea_temp[4*4+(i-4)*2+1]+=abs(DataMatrix[j0][channel_index]-DataMatrix[j1][channel_index]);
-				}
-
-			}
-			fea_temp[4*4+(i-4)*2]=fea_temp[4*4+(i-4)*2]/_mFeaWinWidth;
-		}
-		
-		if(1)
-		{
-			_mFeatureMatrix.push_back(fea_temp);
-			_mLabelVector.push_back(label_temp);
-		}
-		//else
-		//{
-		//	//LB// 测试时根据SVM给出判断结果
-		//	if(0)
-		//	{
-		//		//根据SVM给出判断结果
-		//		for(int k=0;k<_mFeaDimension;k++)
-		//		{
-		//			x[k].index=k;
-		//			x[k].value=fea_temp[k];
-		//		}
-		//		data_predict[mat_index%DATA_LENGTH]=int(svm_predict(model,x));
-		//	}
-		//	else
-		//	{
-		//		// Byespredict is called only here
-		//		data_predict[mat_index%DATA_LENGTH]=int(Byespredict(lda_model_cov,lda_model_mean,fea_temp));
-		//	}
-		//	//LB// 定义double data_predict[DATA_LENGTH]是每行数据的模式状态
-
-		//	if(IS_OnLineTest)
-		//	{
-		//		random_figure=class_num-1;//LB//一般状态下random_figure为REST
-
-		//		if((mat_index/1000)%ACTION_TIME_ONLINE_TESTING>=REST_TIME_ONLINE_TESTING)//LB//在线测试状态下，前3s为REST，后6s为随机动作
-		//		{
-		//			random_figure=random_hand_serial[mat_index/(1000*ACTION_TIME_ONLINE_TESTING)];
-
-		//			if(data_predict[mat_index%DATA_LENGTH]==random_figure)
-		//				Is_Correct_Num++;
-		//		}
-		//		else
-		//		{
-		//			Is_Correct_Num = 0;
-		//			Is_Action = false;
-		//		}
-		//		online_set_label.push_back(random_figure);
-		//		online_label.push_back(data_predict[mat_index%DATA_LENGTH]);//LB// 将data_predict加入label的尾部   为什么减50？改回
-		//	}
-		//}
+				
+		_mFeatureMatrix.push_back(fea_temp);
+		_mLabelVector.push_back(label_temp);
 	}
-}
-
-bool LDA_Bayesian::GenerateModel()
-{
-	return Bayestrain(_mFeatureMatrix, _mLabelVector);
-}
-
-vector<int> LDA_Bayesian::GetClassVector()
-{
-	return _mClassLabel;
-}
-
-int LDA_Bayesian::Predict( vector<double>& x )
-{
-	return Bayespredict(_mModelCov, _mModelMean, x);
 }
 
 std::vector<double> LDA_Bayesian::FeatureExtractToVec( Vector2D& DataMatrix )
@@ -348,9 +266,9 @@ std::vector<double> LDA_Bayesian::FeatureExtractToVec( Vector2D& DataMatrix )
 
 		// feature TD
 		// 3 features: fea0-绝对值之和, fea1-过零点数, fea2-波长, fea3-导数拐点
-		for(int i=0;i<4;i++)//LB// _mChannelNum=8 here
+		for(int i=0;i<_mChannelNum;i++) // _mChannelNum=8 here
 		{
-			channel_index = i; // 1 2 3 4
+			channel_index = i;
 			fea_temp[i*4]=0;fea_temp[i*4+1]=0;fea_temp[i*4+2]=0;fea_temp[i*4+3]=0;			
 			for(int j=0;j<_mFeaWinWidth;j++)
 			{
@@ -375,30 +293,22 @@ std::vector<double> LDA_Bayesian::FeatureExtractToVec( Vector2D& DataMatrix )
 				}
 			}
 		}
-
-		// feature NIR -- I do not care
-		for(int i=4;i<_mChannelNum;i++)//LB// _mChannelNum=8 here
-		{
-			channel_index = i; // 5 6 7 8
-			fea_temp[4*4+(i-4)*2]=0;fea_temp[4*4+(i-4)*2+1]=0;			
-			for(int j=0;j<_mFeaWinWidth;j++)
-			{
-				// _mFeaWinWidth数据窗中的数据，j0是当前采样，j1是上一次采样;
-				int j0 = smp_idx+j;
-				int j1 = j0-1;
-
-				//fea0// fea_temp[16 18 20 22]位上分别是5 6 7 8通道上前(_mFeaWinWidth)个数据绝对值的和
-				fea_temp[4*4+(i-4)*2]+=DataMatrix[j0][channel_index];   
-				if(j>0)
-				{
-					//fea2// fea_temp[17 19 21 23]位上分别是5 6 7 8通道上前(_mFeaWinWidth)个数据相邻两个之差的绝对值的总和
-					fea_temp[4*4+(i-4)*2+1]+=abs(DataMatrix[j0][channel_index]-DataMatrix[j1][channel_index]);
-				}
-
-			}
-			fea_temp[4*4+(i-4)*2]=fea_temp[4*4+(i-4)*2]/_mFeaWinWidth;
-		}	
 	}
 	return fea_temp;
+}
+
+bool LDA_Bayesian::GenerateModel()
+{
+	return Bayestrain(_mFeatureMatrix, _mLabelVector);
+}
+
+vector<int> LDA_Bayesian::GetClassVector()
+{
+	return _mClassLabel;
+}
+
+int LDA_Bayesian::Predict( vector<double>& x )
+{
+	return Bayespredict(_mModelCov, _mModelMean, x);
 }
 

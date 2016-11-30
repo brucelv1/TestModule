@@ -391,13 +391,72 @@ void Dlg_TestModule::on_Btn_CreateReport_clicked()
 
 void Dlg_TestModule::on_BtnExportReport_clicked()
 {
+	QString filename = QFileDialog::getSaveFileName(this,
+		tr("Save Report"),
+		"",
+		tr("Report Files (*.txt)")
+		);
 
+	std::ofstream savefile(filename.toStdString());
+
+	// header
+	savefile << std::setiosflags(std::ios::left) << std::setw(20) << "Item";
+	savefile << std::setiosflags(std::ios::left) << std::setw(20) << "Action";
+	savefile << std::setiosflags(std::ios::left) << std::setw(20) << "Correctness";
+	savefile << std::setiosflags(std::ios::left) << std::setw(20) << "First Hit Delay";
+	savefile << std::setiosflags(std::ios::left) << std::setw(20) << "Stability";
+	savefile << std::endl;
+
+	for (size_t i=0; i<_predictPerAction.size(); i++)
+	{
+		savefile << std::setw(20) << i+1;
+		// name
+		int command = _predictPerAction[i].first;
+		std::string name = "";
+		for (size_t j=0; j<_commandVec.size(); j++)
+		{
+			if(_commandVec[j]->Command == command)
+			{
+				name = _commandVec[j]->Name;
+				break;
+			}
+		}
+		savefile << std::setiosflags(std::ios::left) << std::setw(20) << name;
+
+		// correctness
+		float temp = _rightPrdtPerAction[i];
+		temp /= _predictPerAction[i].second;
+		char buff[20];
+		sprintf_s(buff,"%.4f%%", temp*100);
+		savefile << std::setiosflags(std::ios::left) << std::setw(20) << std::string(buff);
+
+		// fisrt hit delay
+		int delayedSamples = _firstHitDelay[i];
+		std::string fhd;
+		if(delayedSamples<0)
+			fhd = "No Hits";
+		else
+		{
+			char buff[20];
+			sprintf_s(buff,"%d samples", delayedSamples);
+			fhd = std::string(buff);
+		}
+		savefile << std::setiosflags(std::ios::left) << std::setw(20) << fhd;
+
+		// stability
+		temp = _holdStability[i];
+		sprintf_s(buff,"%.4f%%", temp*100);
+		savefile << std::setiosflags(std::ios::left) << std::setw(20) << std::string(buff);
+
+		if(i != _predictPerAction.size()-1)
+			savefile << std::endl;
+	}
 }
 
 
 void Dlg_TestModule::_initTableView()
 {
-	_tableModel->setHorizontalHeaderItem(0,new QStandardItem("Name"));
+	_tableModel->setHorizontalHeaderItem(0,new QStandardItem("Action"));
 	_tableModel->setHorizontalHeaderItem(1,new QStandardItem("Correctness"));
 	_tableModel->setHorizontalHeaderItem(2,new QStandardItem("First Hit Delay"));
 	_tableModel->setHorizontalHeaderItem(3,new QStandardItem("Stability"));

@@ -199,7 +199,7 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 	steady_clock::time_point t1, t2;
 
 	// 臂带一开始不能正常读数，先等待1000ms
-	//boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+	::Sleep(1000);
 
 	// counting
 	int progress = 0;
@@ -230,27 +230,23 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 		t1 = steady_clock::now();
 		do 
 		{
-			boost::this_thread::sleep_for(boost::chrono::milliseconds(250));
+			::Sleep(250);
 			t2 = steady_clock::now();
 			time_span = duration_cast<duration<double> > (t2-t1);
 
-			if (time_span.count() <= 1)
-			{
+			if (time_span.count() <= 1) {
 				std::cout << "3 ";
 				//dtm->_ucpNameSharedMem[5] = 3;// set memory to 3
 			}
-			else if (time_span.count() <= 2)
-			{
+			else if (time_span.count() <= 2) {
 				std::cout << "2 ";
 				//dtm->_ucpNameSharedMem[5] = 2;// set memory to 2
 			}
-			else if (time_span.count() <= 3)
-			{
+			else if (time_span.count() <= 3) {
 				std::cout << "1 ";
 				//dtm->_ucpNameSharedMem[5] = 1;// set memory to 1
 			}
-			else
-			{
+			else {
 				std::cout << "0\n";
 				//dtm->_ucpNameSharedMem[5] = 0;// set memory to 0
 				break;
@@ -295,7 +291,8 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 				dtm->_armBandData.clear();
 			}
 
-			boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
+			// yield the CPU
+			::Sleep(1);
 
 			t2 = steady_clock::now();
 			time_span = duration_cast<duration<double> > (t2-t1);

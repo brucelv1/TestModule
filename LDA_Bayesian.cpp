@@ -16,7 +16,7 @@ LDA_Bayesian::~LDA_Bayesian()
 
 bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& label)
 {
-	using namespace Eigen;  
+	using namespace Eigen;
 
 	//number of features and dimension of features
 	int feat_num = feature.size();

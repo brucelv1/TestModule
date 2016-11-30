@@ -247,19 +247,19 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 
 			if (time_span.count() <= 1) {
 				std::cout << "3 ";
-				//dtm->_ucpNameSharedMem[5] = 3;// set memory to 3
+				dtm->_ucpNameSharedMem[5] = 3;// set memory to 3
 			}
 			else if (time_span.count() <= 2) {
 				std::cout << "2 ";
-				//dtm->_ucpNameSharedMem[5] = 2;// set memory to 2
+				dtm->_ucpNameSharedMem[5] = 2;// set memory to 2
 			}
 			else if (time_span.count() <= 3) {
 				std::cout << "1 ";
-				//dtm->_ucpNameSharedMem[5] = 1;// set memory to 1
+				dtm->_ucpNameSharedMem[5] = 1;// set memory to 1
 			}
 			else {
 				std::cout << "0\n";
-				//dtm->_ucpNameSharedMem[5] = 0;// set memory to 0
+				dtm->_ucpNameSharedMem[5] = 0;// set memory to 0
 				break;
 			}
 		} while (1);

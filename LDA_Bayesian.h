@@ -41,6 +41,9 @@ public:
 	// generate model parameters and save, using extracted feature and label
 	bool GenerateModel();
 
+	// save model to dist
+	bool SaveModel(std::string& Dir_Name);
+
 	// unique label: it means different classes
 	vector<int> GetClassVector();
 

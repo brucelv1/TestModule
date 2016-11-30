@@ -22,7 +22,7 @@ static const uint qt_meta_data_Dlg_TestModule[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       7,   14, // methods
+       9,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -34,9 +34,11 @@ static const uint qt_meta_data_Dlg_TestModule[] = {
       45,   15,   15,   15, 0x0a,
       72,   15,   15,   15, 0x0a,
      105,   15,   15,   15, 0x0a,
-     130,   15,   15,   15, 0x0a,
-     157,   15,   15,   15, 0x0a,
-     187,   15,   15,   15, 0x08,
+     136,   15,   15,   15, 0x0a,
+     161,   15,   15,   15, 0x0a,
+     188,   15,   15,   15, 0x0a,
+     218,   15,   15,   15, 0x0a,
+     247,   15,   15,   15, 0x08,
 
        0        // eod
 };
@@ -45,9 +47,11 @@ static const char qt_meta_stringdata_Dlg_TestModule[] = {
     "Dlg_TestModule\0\0on_BtnImportConfig_clicked()\0"
     "on_BtnImportData_clicked()\0"
     "on_BtnCreateClassifier_clicked()\0"
+    "on_BtnSaveClassifier_clicked()\0"
     "on_Btn_Connect_clicked()\0"
     "on_Btn_StartTest_clicked()\0"
     "on_Btn_CreateReport_clicked()\0"
+    "on_BtnExportReport_clicked()\0"
     "_qTimer_timeout()\0"
 };
 
@@ -60,10 +64,12 @@ void Dlg_TestModule::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 0: _t->on_BtnImportConfig_clicked(); break;
         case 1: _t->on_BtnImportData_clicked(); break;
         case 2: _t->on_BtnCreateClassifier_clicked(); break;
-        case 3: _t->on_Btn_Connect_clicked(); break;
-        case 4: _t->on_Btn_StartTest_clicked(); break;
-        case 5: _t->on_Btn_CreateReport_clicked(); break;
-        case 6: _t->_qTimer_timeout(); break;
+        case 3: _t->on_BtnSaveClassifier_clicked(); break;
+        case 4: _t->on_Btn_Connect_clicked(); break;
+        case 5: _t->on_Btn_StartTest_clicked(); break;
+        case 6: _t->on_Btn_CreateReport_clicked(); break;
+        case 7: _t->on_BtnExportReport_clicked(); break;
+        case 8: _t->_qTimer_timeout(); break;
         default: ;
         }
     }
@@ -104,9 +110,9 @@ int Dlg_TestModule::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 7)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 9;
     }
     return _id;
 }

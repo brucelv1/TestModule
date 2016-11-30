@@ -95,9 +95,11 @@ public slots:
 	void on_BtnImportConfig_clicked();
 	void on_BtnImportData_clicked();
 	void on_BtnCreateClassifier_clicked();
+	void on_BtnSaveClassifier_clicked();
 	void on_Btn_Connect_clicked();
 	void on_Btn_StartTest_clicked();
 	void on_Btn_CreateReport_clicked();
+	void on_BtnExportReport_clicked();
 
 private slots:
 	void _qTimer_timeout();

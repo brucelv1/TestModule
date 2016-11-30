@@ -89,7 +89,6 @@ void Dlg_TestModule::on_BtnCreateClassifier_clicked()
 		trainData.push_back(data_tmp);
 	}
 
-	
 	_mLDA->FeatureExtract(trainData,labelVec);
 	if(_mLDA->GenerateModel()==true)
 	{
@@ -101,6 +100,18 @@ void Dlg_TestModule::on_BtnCreateClassifier_clicked()
 		QMessageBox::information(NULL, "Information", "Fail to generate LDA model.", QMessageBox::Ok);
 		LEClassifierStatus->setText("Failed, please try again.");
 		return;
+	}
+}
+
+void Dlg_TestModule::on_BtnSaveClassifier_clicked()
+{
+	QString dirname = QFileDialog::getExistingDirectory( this );
+
+	if (!dirname.isNull())
+	{
+		LEClassifierSaveStatus->setText(dirname);
+		dirname.replace("\\","\\\\");
+		_mLDA->SaveModel(dirname.toStdString());
 	}
 }
 
@@ -376,8 +387,13 @@ void Dlg_TestModule::on_Btn_CreateReport_clicked()
 		QString stb = QString(buff);
 		_tableModel->setItem(i,3,new QStandardItem(stb));
 	}
+}
+
+void Dlg_TestModule::on_BtnExportReport_clicked()
+{
 
 }
+
 
 void Dlg_TestModule::_initTableView()
 {
@@ -399,3 +415,4 @@ void Dlg_TestModule::_qTimer_timeout()
 	//std::cout << "process: " << _ucpNameSharedMem[6] << std::endl;
 	//progressBar->setValue(_ucpNameSharedMem[6]);
 }
+

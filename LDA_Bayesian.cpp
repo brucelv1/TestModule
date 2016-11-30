@@ -87,7 +87,7 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 	PoolCovMat/=(feat_num-cnum);
 	PoolCovMat = PoolCovMat.inverse();
 
-	//transform the data format from Eigen to Vector
+	//transform the data format from Eigen to member vectors
 	vector<double> temp;
 	for(int i=0;i<cnum;i++)
 	{
@@ -107,37 +107,6 @@ bool LDA_Bayesian::Bayestrain(vector<vector<double> >& feature, vector<int>& lab
 		_mModelCov.push_back(temp);
 		temp.clear();
 	}
-
-	//save the baseline model data
-	std::ofstream savefile;
-	savefile.open(".\\data\\model\\LDA_mean.txt");
-	if (!savefile.is_open())
-	{
-		std::cout << "Can't open file: .\\data\\model\\LDA_mean.txt" << std::endl;
-		return false;
-	}
-	for(int i=0;i<cnum;i++)
-	{
-		for(int j=0;j<feat_dim;j++)
-			savefile<<_mModelMean[i][j]<<'\t';
-		savefile<<'\n';
-	}
-	savefile.close();
-
-
-	savefile.open(".\\data\\model\\LDA_cov.txt");
-	if (!savefile.is_open())
-	{
-		std::cout << "Can't open file: .\\data\\model\\LDA_cov.txt" << std::endl;
-		return false;
-	}
-	for(int i=0;i<feat_dim;i++)
-	{
-		for(int j=0;j<feat_dim;j++)
-			savefile<<_mModelCov[i][j]<<'\t';
-		savefile<<'\n';
-	}
-	savefile.close();
 
 	return true;
 }
@@ -310,5 +279,45 @@ vector<int> LDA_Bayesian::GetClassVector()
 int LDA_Bayesian::Predict( vector<double>& x )
 {
 	return Bayespredict(_mModelCov, _mModelMean, x);
+}
+
+bool LDA_Bayesian::SaveModel( std::string& Dir_Name )
+{
+	//save the baseline model data
+	std::ofstream savefile;
+	savefile.open(Dir_Name+"\\LDA_mean.txt");
+	if (!savefile.is_open())
+	{
+		std::cout << "Can't open file: LDA_mean.txt" << std::endl;
+		return false;
+	}
+
+	// save mean matrix
+	for(int i=0;i<_mModelMean.size();i++)
+	{
+		for(int j=0; j<_mModelMean[i].size(); j++)
+			savefile<<_mModelMean[i][j]<<'\t';
+		if(i != _mModelMean.size()-1)
+			savefile<<'\n';
+	}
+	savefile.close();
+
+	// save covariance matrix
+	savefile.open(Dir_Name+"\\LDA_cov.txt");
+	if (!savefile.is_open())
+	{
+		std::cout << "Can't open file: LDA_cov.txt" << std::endl;
+		return false;
+	}
+	for(int i=0; i<_mModelCov.size(); i++)
+	{
+		for(int j=0; j<_mModelCov[i].size(); j++)
+			savefile<<_mModelCov[i][j]<<'\t';
+		if(i != _mModelCov.size()-1)
+			savefile<<'\n';
+	}
+	savefile.close();
+
+	return true;
 }
 

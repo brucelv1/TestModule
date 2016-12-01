@@ -63,14 +63,16 @@ public:
     QPushButton *BtnExportReport;
     QPushButton *BtnSaveClassifier;
     QLineEdit *LEClassifierSaveStatus;
+    QPushButton *BtnOpenPlugin;
+    QLineEdit *LEPluginStatus;
 
     void setupUi(QDialog *TestModule)
     {
         if (TestModule->objectName().isEmpty())
             TestModule->setObjectName(QString::fromUtf8("TestModule"));
-        TestModule->resize(535, 720);
-        TestModule->setMinimumSize(QSize(535, 720));
-        TestModule->setMaximumSize(QSize(535, 720));
+        TestModule->resize(535, 770);
+        TestModule->setMinimumSize(QSize(535, 770));
+        TestModule->setMaximumSize(QSize(770, 10000));
         BtnImportConfig = new QPushButton(TestModule);
         BtnImportConfig->setObjectName(QString::fromUtf8("BtnImportConfig"));
         BtnImportConfig->setGeometry(QRect(10, 20, 121, 31));
@@ -87,13 +89,13 @@ public:
         LEDataPath->setReadOnly(true);
         BtnCreateClassifier = new QPushButton(TestModule);
         BtnCreateClassifier->setObjectName(QString::fromUtf8("BtnCreateClassifier"));
-        BtnCreateClassifier->setGeometry(QRect(10, 120, 121, 31));
+        BtnCreateClassifier->setGeometry(QRect(10, 170, 121, 31));
         LEClassifierStatus = new QLineEdit(TestModule);
         LEClassifierStatus->setObjectName(QString::fromUtf8("LEClassifierStatus"));
-        LEClassifierStatus->setGeometry(QRect(150, 130, 371, 21));
+        LEClassifierStatus->setGeometry(QRect(150, 180, 371, 21));
         groupBox = new QGroupBox(TestModule);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 220, 511, 81));
+        groupBox->setGeometry(QRect(10, 270, 511, 81));
         horizontalLayout_2 = new QHBoxLayout(groupBox);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalLayout = new QHBoxLayout();
@@ -128,7 +130,7 @@ public:
 
         groupBox_2 = new QGroupBox(TestModule);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        groupBox_2->setGeometry(QRect(10, 310, 511, 71));
+        groupBox_2->setGeometry(QRect(10, 360, 511, 71));
         horizontalLayout_4 = new QHBoxLayout(groupBox_2);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         horizontalLayout_3 = new QHBoxLayout();
@@ -162,14 +164,14 @@ public:
 
         Btn_StartTest = new QPushButton(TestModule);
         Btn_StartTest->setObjectName(QString::fromUtf8("Btn_StartTest"));
-        Btn_StartTest->setGeometry(QRect(10, 400, 81, 31));
+        Btn_StartTest->setGeometry(QRect(10, 450, 81, 31));
         progressBar = new QProgressBar(TestModule);
         progressBar->setObjectName(QString::fromUtf8("progressBar"));
-        progressBar->setGeometry(QRect(110, 400, 411, 31));
+        progressBar->setGeometry(QRect(110, 450, 411, 31));
         progressBar->setValue(0);
         groupBox_3 = new QGroupBox(TestModule);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
-        groupBox_3->setGeometry(QRect(10, 440, 511, 261));
+        groupBox_3->setGeometry(QRect(10, 490, 511, 261));
         horizontalLayout_5 = new QHBoxLayout(groupBox_3);
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
         verticalLayout = new QVBoxLayout();
@@ -199,11 +201,17 @@ public:
 
         BtnSaveClassifier = new QPushButton(TestModule);
         BtnSaveClassifier->setObjectName(QString::fromUtf8("BtnSaveClassifier"));
-        BtnSaveClassifier->setGeometry(QRect(10, 170, 121, 31));
+        BtnSaveClassifier->setGeometry(QRect(10, 220, 121, 31));
         LEClassifierSaveStatus = new QLineEdit(TestModule);
         LEClassifierSaveStatus->setObjectName(QString::fromUtf8("LEClassifierSaveStatus"));
-        LEClassifierSaveStatus->setGeometry(QRect(150, 180, 371, 21));
+        LEClassifierSaveStatus->setGeometry(QRect(150, 230, 371, 21));
         LEClassifierSaveStatus->setReadOnly(true);
+        BtnOpenPlugin = new QPushButton(TestModule);
+        BtnOpenPlugin->setObjectName(QString::fromUtf8("BtnOpenPlugin"));
+        BtnOpenPlugin->setGeometry(QRect(10, 120, 121, 31));
+        LEPluginStatus = new QLineEdit(TestModule);
+        LEPluginStatus->setObjectName(QString::fromUtf8("LEPluginStatus"));
+        LEPluginStatus->setGeometry(QRect(150, 130, 371, 21));
 
         retranslateUi(TestModule);
 
@@ -240,6 +248,7 @@ public:
         Btn_CreateReport->setText(QApplication::translate("TestModule", "\347\224\237\346\210\220\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
         BtnExportReport->setText(QApplication::translate("TestModule", "\345\257\274\345\207\272\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
         BtnSaveClassifier->setText(QApplication::translate("TestModule", "\344\277\235\345\255\230\345\210\206\347\261\273\345\231\250", 0, QApplication::UnicodeUTF8));
+        BtnOpenPlugin->setText(QApplication::translate("TestModule", "\346\211\223\345\274\200\345\210\206\347\261\273\345\231\250\346\217\222\344\273\266", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

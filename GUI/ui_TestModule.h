@@ -75,17 +75,17 @@ public:
         TestModule->setMaximumSize(QSize(770, 10000));
         BtnImportConfig = new QPushButton(TestModule);
         BtnImportConfig->setObjectName(QString::fromUtf8("BtnImportConfig"));
-        BtnImportConfig->setGeometry(QRect(10, 20, 121, 31));
+        BtnImportConfig->setGeometry(QRect(10, 70, 121, 31));
         BtnImportData = new QPushButton(TestModule);
         BtnImportData->setObjectName(QString::fromUtf8("BtnImportData"));
-        BtnImportData->setGeometry(QRect(10, 70, 121, 31));
+        BtnImportData->setGeometry(QRect(10, 120, 121, 31));
         LEConfigPath = new QLineEdit(TestModule);
         LEConfigPath->setObjectName(QString::fromUtf8("LEConfigPath"));
-        LEConfigPath->setGeometry(QRect(150, 30, 371, 21));
+        LEConfigPath->setGeometry(QRect(150, 80, 371, 21));
         LEConfigPath->setReadOnly(true);
         LEDataPath = new QLineEdit(TestModule);
         LEDataPath->setObjectName(QString::fromUtf8("LEDataPath"));
-        LEDataPath->setGeometry(QRect(150, 80, 371, 21));
+        LEDataPath->setGeometry(QRect(150, 130, 371, 21));
         LEDataPath->setReadOnly(true);
         BtnCreateClassifier = new QPushButton(TestModule);
         BtnCreateClassifier->setObjectName(QString::fromUtf8("BtnCreateClassifier"));
@@ -208,10 +208,10 @@ public:
         LEClassifierSaveStatus->setReadOnly(true);
         BtnOpenPlugin = new QPushButton(TestModule);
         BtnOpenPlugin->setObjectName(QString::fromUtf8("BtnOpenPlugin"));
-        BtnOpenPlugin->setGeometry(QRect(10, 120, 121, 31));
+        BtnOpenPlugin->setGeometry(QRect(10, 20, 121, 31));
         LEPluginStatus = new QLineEdit(TestModule);
         LEPluginStatus->setObjectName(QString::fromUtf8("LEPluginStatus"));
-        LEPluginStatus->setGeometry(QRect(150, 130, 371, 21));
+        LEPluginStatus->setGeometry(QRect(150, 30, 371, 21));
 
         retranslateUi(TestModule);
 

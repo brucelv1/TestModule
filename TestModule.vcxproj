@@ -84,13 +84,12 @@
   <ItemGroup>
     <ClCompile Include="Dlg_TestModule.cpp" />
     <ClCompile Include="HelperArmBand.cpp" />
-    <ClCompile Include="LDA_Bayesian.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="moc_Dlg_TestModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HelperArmBand.h" />
-    <ClInclude Include="LDA_Bayesian.h" />
+    <ClInclude Include="ClassifierBase.h" />
     <CustomBuild Include="Dlg_TestModule.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc.exe Dlg_TestModule.h -o moc_Dlg_TestModule.cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc_Dlg_TestModule.cpp</Outputs>

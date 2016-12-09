@@ -7,7 +7,7 @@
 #include "HelperArmBand.h"
 #include <boost/thread.hpp>
 #include <QtCore/QTimer>
-#include "LDA_Bayesian.h"
+#include "ClassifierBase.h"
 #include <QtGui/QAbstractItemView>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
@@ -60,8 +60,12 @@ private:
 	QTimer* qTimer;
 	int processingBarVal;
 
-	// classifier
-	LDA_Bayesian* _mLDA;
+	// Classifier
+	ClassifierBase* _mClassifier;
+	typedef ClassifierBase* (*CreateClassifier)();
+	typedef void (*DestroyClassifier)(ClassifierBase*);
+	CreateClassifier _mCreateClassifierFunc;
+	DestroyClassifier _mDestroyClassifierFunc;
 
 	// Shared memory
 	unsigned char* _ucpNameSharedMem;
@@ -91,6 +95,8 @@ private:
 
 	void _initTableView();
 
+	void _updateGUI();
+
 public slots:
 	void on_BtnImportConfig_clicked();
 	void on_BtnImportData_clicked();
@@ -100,6 +106,7 @@ public slots:
 	void on_Btn_StartTest_clicked();
 	void on_Btn_CreateReport_clicked();
 	void on_BtnExportReport_clicked();
+	void on_BtnOpenPlugin_clicked();
 
 private slots:
 	void _qTimer_timeout();

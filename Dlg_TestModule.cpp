@@ -7,11 +7,14 @@
 #include <QtGui/QMessageBox>
 #include <QtCore/QString>
 #include <algorithm>
+#include <Windows.h> // DLL
 
 Dlg_TestModule::Dlg_TestModule(unsigned char* nameSharedMem, size_t lenSharedMem, QWidget* parent /*= NULL*/ )
 	: QDialog(parent)
 	, _armBand(new SJTArmBand())
-	, _mLDA(new LDA_Bayesian())
+	, _mClassifier(nullptr)
+	, _mCreateClassifierFunc(nullptr)
+	, _mDestroyClassifierFunc(nullptr)
 	, _ucpNameSharedMem(nameSharedMem)
 	, _stLenSharedMem(lenSharedMem)
 	, _tableModel(new QStandardItemModel(this))
@@ -21,11 +24,16 @@ Dlg_TestModule::Dlg_TestModule(unsigned char* nameSharedMem, size_t lenSharedMem
 	_initTableView();
 	qTimer = new QTimer(this);
 	connect(qTimer, SIGNAL(timeout()), this, SLOT(_qTimer_timeout()));
+	_updateGUI();
 }
 
 Dlg_TestModule::~Dlg_TestModule()
 {
 	_mThread.join();
+	if (_mClassifier != nullptr)
+	{
+		_mDestroyClassifierFunc(_mClassifier);
+	}
 }
 
 void Dlg_TestModule::on_BtnImportConfig_clicked()
@@ -89,15 +97,17 @@ void Dlg_TestModule::on_BtnCreateClassifier_clicked()
 		trainData.push_back(data_tmp);
 	}
 
-	_mLDA->FeatureExtract(trainData,labelVec);
-	if(_mLDA->GenerateModel()==true)
+	// generate a classifier by its specific logic
+	if(_mClassifier->GenerateModel(trainData,labelVec)==true)
 	{
-		LEClassifierStatus->setText("LDA model is generated.");
+		string name = _mClassifier->GetName();
+		name += " model is generated.";
+		LEClassifierStatus->setText(name.c_str());
 		return;
 	}
 	else
 	{
-		QMessageBox::information(NULL, "Information", "Fail to generate LDA model.", QMessageBox::Ok);
+		QMessageBox::information(NULL, "Information", "Fail to generate the model.", QMessageBox::Ok);
 		LEClassifierStatus->setText("Failed, please try again.");
 		return;
 	}
@@ -111,7 +121,7 @@ void Dlg_TestModule::on_BtnSaveClassifier_clicked()
 	{
 		LEClassifierSaveStatus->setText(dirname);
 		dirname.replace("\\","\\\\");
-		_mLDA->SaveModel(dirname.toStdString());
+		_mClassifier->SaveModelToDisk(dirname.toStdString());
 	}
 }
 
@@ -143,7 +153,9 @@ void Dlg_TestModule::on_Btn_StartTest_clicked()
 
 	// generate test series and shuffle it
 	std::vector<int> testSeries;
-	std::vector<int> classLabel = _mLDA->GetClassVector();
+
+	std::vector<int> classLabel = _mClassifier->GetClassVector();
+
 	for(int i=1; i<=spinB_ActionTimes->value(); i++)
 	{
 		testSeries.insert(testSeries.end(), classLabel.begin(), classLabel.end());
@@ -274,6 +286,7 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 		// sampling, wait for duration
 		t1 = steady_clock::now();
 		int sampleIdx = 0;
+		int winLength = dtm->_mClassifier->GetWindowLength();
 		do 
 		{
 			// data query
@@ -283,10 +296,9 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 			}
 
 			// 凑够了一个窗长，做一次预测
-			if (dtm->_armBandData.size() == dtm->_mLDA->_mFeaWinWidth)
+			if (dtm->_armBandData.size() == winLength)
 			{
-				std::vector<double> fea = dtm->_mLDA->FeatureExtractToVec(dtm->_armBandData);
-				int predict = dtm->_mLDA->Predict(fea);
+				int predict = dtm->_mClassifier->Predict(dtm->_armBandData);
 				
 				cnt++;
 				if (predict == command)
@@ -319,9 +331,9 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 		// statistics
 		dtm->_predictPerAction.push_back(std::make_pair(command, cnt));
 		dtm->_rightPrdtPerAction.push_back(right);
-		dtm->_firstHitDelay.push_back((firstHit-1)*(dtm->_mLDA->_mFeaWinWidth));
+		dtm->_firstHitDelay.push_back((firstHit-1)*winLength);
 		dtm->_holdStability.push_back(right*1.0/(cnt-firstHit+1));
-
+		
 		progress+=1;
 		dtm->processingBarVal = 100*progress/total_num;
 	}
@@ -473,5 +485,71 @@ void Dlg_TestModule::_qTimer_timeout()
 	progressBar->setValue(processingBarVal);
 	//std::cout << "process: " << _ucpNameSharedMem[6] << std::endl;
 	//progressBar->setValue(_ucpNameSharedMem[6]);
+}
+
+void Dlg_TestModule::on_BtnOpenPlugin_clicked()
+{
+	QString dll_name = QFileDialog::getOpenFileName(this,
+		tr("Import Classifier Plug-in"), 
+		"",
+		tr("Classifier (*.dll)"), 
+		0);
+
+	if (!dll_name.isNull())
+	{
+		LEPluginStatus->setText(dll_name);
+
+		HINSTANCE hGetProcIDDLL = LoadLibraryA(dll_name.toStdString().c_str());
+		if ( !hGetProcIDDLL )
+		{
+			QMessageBox::information(NULL, "Warning", "Cannot load the dynamic library. Please try again", QMessageBox::Ok);
+			return;
+		}
+
+		_mCreateClassifierFunc = (CreateClassifier)GetProcAddress(hGetProcIDDLL, "CreateClassifier");
+		_mDestroyClassifierFunc = (DestroyClassifier)GetProcAddress(hGetProcIDDLL, "DestroyClassifier");
+		if (!_mCreateClassifierFunc || !_mDestroyClassifierFunc)
+		{
+			QMessageBox::information(NULL, "Warning", "Load Error. Please check your DLL and try again", QMessageBox::Ok);
+			return;
+		}
+
+		_mClassifier = _mCreateClassifierFunc();
+		_updateGUI();
+	}
+	else
+	{
+		QMessageBox::information(NULL, "Warning", "Classifier cannot be null. Please try again", QMessageBox::Ok);
+		return;
+	}
+}
+
+void Dlg_TestModule::_updateGUI()
+{
+	// if no classifier, all button except BtnOpenPlugin should be disabled
+	if(_mClassifier == nullptr)
+	{
+		BtnOpenPlugin->setEnabled(true);
+		BtnImportConfig->setEnabled(false);
+		BtnImportData->setEnabled(false);
+		BtnCreateClassifier->setEnabled(false);
+		BtnSaveClassifier->setEnabled(false);
+		Btn_Connect->setEnabled(false);
+		Btn_StartTest->setEnabled(false);
+		Btn_CreateReport->setEnabled(false);
+		BtnExportReport->setEnabled(false);
+	}
+	else
+	{
+		BtnOpenPlugin->setEnabled(false);
+		BtnImportConfig->setEnabled(true);
+		BtnImportData->setEnabled(true);
+		BtnCreateClassifier->setEnabled(true);
+		BtnSaveClassifier->setEnabled(true);
+		Btn_Connect->setEnabled(true);
+		Btn_StartTest->setEnabled(true);
+		Btn_CreateReport->setEnabled(true);
+		BtnExportReport->setEnabled(true);
+	}
 }
 

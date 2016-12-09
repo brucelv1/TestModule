@@ -39,6 +39,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(QT_INC);$(BOOST_ROOT);$(IncludePath)</IncludePath>
+    <LibraryPath>$(QT_LIB);$(BOOST_ROOT)/lib32-msvc-10.0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -54,7 +56,13 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>QtCored4.lib;QtGuid4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>16000000</StackReserveSize>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -74,7 +82,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Dlg_TestModule.cpp" />
+    <ClCompile Include="HelperArmBand.cpp" />
+    <ClCompile Include="LDA_Bayesian.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="moc_Dlg_TestModule.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HelperArmBand.h" />
+    <ClInclude Include="LDA_Bayesian.h" />
+    <CustomBuild Include="Dlg_TestModule.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc.exe Dlg_TestModule.h -o moc_Dlg_TestModule.cpp</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc_Dlg_TestModule.cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc.exe Dlg_TestModule.h</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="GUI\ui_TestModule.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

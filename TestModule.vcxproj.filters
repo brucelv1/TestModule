@@ -18,5 +18,33 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Dlg_TestModule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="moc_Dlg_TestModule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LDA_Bayesian.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HelperArmBand.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GUI\ui_TestModule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LDA_Bayesian.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HelperArmBand.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Dlg_TestModule.h">
+      <Filter>头文件</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

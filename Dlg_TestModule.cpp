@@ -354,6 +354,13 @@ void Dlg_TestModule::_threadSend( Dlg_TestModule* dtm, std::vector<int> testSeri
 		progress+=1;
 		dtm->processingBarVal = 100*progress/total_num;
 	}
+
+	// after test series, let virtual hand get back to REST position
+	// write shared memory
+	dtm->_ucpNameSharedMem[4] = 0;
+	dtm->_ucpNameSharedMem[3] = 0;
+	dtm->_ucpNameSharedMem[2] = 0; // not used yet
+	dtm->_ucpNameSharedMem[1] = 0; // not used yet
 	return;
 }
 

@@ -135,10 +135,27 @@ void Dlg_TestModule::on_Btn_Connect_clicked()
 		LE_Armband_Status->setText("Connection Failed.");
 		return;
 	}
-	else
+
+	// 硬件刚连接时可能存在读数全是0的情况，这里做个检查
+	vector<double> armband_data = _armBand->GetDataVector();
+	double sum = 0;
+	for (size_t i=0; i<armband_data.size(); i++)
 	{
-		LE_Armband_Status->setText("Connection Successful.");
+		sum+=armband_data[i];
 	}
+	while(sum == 0) // 臂带还没有开始工作，数据全是0
+	{
+		::Sleep(200);
+		armband_data = _armBand->GetDataVector();
+		sum = 0;
+		for (size_t i=0; i<armband_data.size(); i++)
+		{
+			sum+=armband_data[i];
+		}
+	}
+
+	// 臂带已经开始正常采集数据
+	LE_Armband_Status->setText("Connection Successful.");
 }
 
 void Dlg_TestModule::on_Btn_StartTest_clicked()

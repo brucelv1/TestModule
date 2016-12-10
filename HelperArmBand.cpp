@@ -7,7 +7,7 @@
 // 默认使用的数据更新线程
 static DWORD WINAPI DataThreadEntry_EMG(PVOID arg) 
 {
-	((SJTArmBand *)arg)->OpenSerial();
+	//((SJTArmBand *)arg)->OpenSerial();
 	while(((SJTArmBand *)arg)->thread_state!=END)
 	{
 		if(((SJTArmBand *)arg)->mSerialSuccessful)
@@ -15,7 +15,11 @@ static DWORD WINAPI DataThreadEntry_EMG(PVOID arg)
 		else
 			((SJTArmBand *)arg)->thread_state=END;
 	}
-	((SJTArmBand *)arg)->CloseSerial();
+	// close the serial port
+	if (((SJTArmBand *)arg)->mSerialSuccessful)
+	{
+		((SJTArmBand *)arg)->CloseSerial();
+	}
 	return 0;
 }
 /*******************************************
@@ -237,6 +241,7 @@ bool SJTArmBand::Connect(int _nCOM/*=5*/, int _BaudRate/*=57600*/)
 {
 	this->nCOM = _nCOM;
 	this->Baudrate = _BaudRate;
+	this->OpenSerial();
 
 	switch (mDevice)
 	{

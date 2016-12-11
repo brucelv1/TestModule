@@ -31,12 +31,23 @@ QT_BEGIN_NAMESPACE
 class Ui_TestModule
 {
 public:
+    QHBoxLayout *horizontalLayout_13;
+    QVBoxLayout *verticalLayout_2;
+    QHBoxLayout *horizontalLayout_7;
+    QPushButton *BtnOpenPlugin;
+    QLineEdit *LEPluginStatus;
+    QHBoxLayout *horizontalLayout_8;
     QPushButton *BtnImportConfig;
-    QPushButton *BtnImportData;
     QLineEdit *LEConfigPath;
+    QHBoxLayout *horizontalLayout_9;
+    QPushButton *BtnImportData;
     QLineEdit *LEDataPath;
+    QHBoxLayout *horizontalLayout_10;
     QPushButton *BtnCreateClassifier;
     QLineEdit *LEClassifierStatus;
+    QHBoxLayout *horizontalLayout_11;
+    QPushButton *BtnSaveClassifier;
+    QLineEdit *LEClassifierSaveStatus;
     QGroupBox *groupBox;
     QHBoxLayout *horizontalLayout_2;
     QHBoxLayout *horizontalLayout;
@@ -52,6 +63,7 @@ public:
     QSpinBox *spinB_ActionTimes;
     QLabel *label_4;
     QSpinBox *spinB_ActionDuration;
+    QHBoxLayout *horizontalLayout_12;
     QPushButton *Btn_StartTest;
     QProgressBar *progressBar;
     QGroupBox *groupBox_3;
@@ -61,41 +73,108 @@ public:
     QHBoxLayout *horizontalLayout_6;
     QPushButton *Btn_CreateReport;
     QPushButton *BtnExportReport;
-    QPushButton *BtnSaveClassifier;
-    QLineEdit *LEClassifierSaveStatus;
-    QPushButton *BtnOpenPlugin;
-    QLineEdit *LEPluginStatus;
 
     void setupUi(QDialog *TestModule)
     {
         if (TestModule->objectName().isEmpty())
             TestModule->setObjectName(QString::fromUtf8("TestModule"));
-        TestModule->resize(535, 770);
-        TestModule->setMinimumSize(QSize(535, 770));
-        TestModule->setMaximumSize(QSize(770, 10000));
+        TestModule->resize(525, 550);
+        TestModule->setMinimumSize(QSize(525, 550));
+        TestModule->setMaximumSize(QSize(10000, 10000));
+        horizontalLayout_13 = new QHBoxLayout(TestModule);
+        horizontalLayout_13->setObjectName(QString::fromUtf8("horizontalLayout_13"));
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        BtnOpenPlugin = new QPushButton(TestModule);
+        BtnOpenPlugin->setObjectName(QString::fromUtf8("BtnOpenPlugin"));
+
+        horizontalLayout_7->addWidget(BtnOpenPlugin);
+
+        LEPluginStatus = new QLineEdit(TestModule);
+        LEPluginStatus->setObjectName(QString::fromUtf8("LEPluginStatus"));
+
+        horizontalLayout_7->addWidget(LEPluginStatus);
+
+        horizontalLayout_7->setStretch(0, 1);
+        horizontalLayout_7->setStretch(1, 3);
+
+        verticalLayout_2->addLayout(horizontalLayout_7);
+
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
         BtnImportConfig = new QPushButton(TestModule);
         BtnImportConfig->setObjectName(QString::fromUtf8("BtnImportConfig"));
-        BtnImportConfig->setGeometry(QRect(10, 70, 121, 31));
-        BtnImportData = new QPushButton(TestModule);
-        BtnImportData->setObjectName(QString::fromUtf8("BtnImportData"));
-        BtnImportData->setGeometry(QRect(10, 120, 121, 31));
+
+        horizontalLayout_8->addWidget(BtnImportConfig);
+
         LEConfigPath = new QLineEdit(TestModule);
         LEConfigPath->setObjectName(QString::fromUtf8("LEConfigPath"));
-        LEConfigPath->setGeometry(QRect(150, 80, 371, 21));
         LEConfigPath->setReadOnly(true);
+
+        horizontalLayout_8->addWidget(LEConfigPath);
+
+        horizontalLayout_8->setStretch(0, 1);
+        horizontalLayout_8->setStretch(1, 3);
+
+        verticalLayout_2->addLayout(horizontalLayout_8);
+
+        horizontalLayout_9 = new QHBoxLayout();
+        horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
+        BtnImportData = new QPushButton(TestModule);
+        BtnImportData->setObjectName(QString::fromUtf8("BtnImportData"));
+
+        horizontalLayout_9->addWidget(BtnImportData);
+
         LEDataPath = new QLineEdit(TestModule);
         LEDataPath->setObjectName(QString::fromUtf8("LEDataPath"));
-        LEDataPath->setGeometry(QRect(150, 130, 371, 21));
         LEDataPath->setReadOnly(true);
+
+        horizontalLayout_9->addWidget(LEDataPath);
+
+        horizontalLayout_9->setStretch(0, 1);
+        horizontalLayout_9->setStretch(1, 3);
+
+        verticalLayout_2->addLayout(horizontalLayout_9);
+
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
         BtnCreateClassifier = new QPushButton(TestModule);
         BtnCreateClassifier->setObjectName(QString::fromUtf8("BtnCreateClassifier"));
-        BtnCreateClassifier->setGeometry(QRect(10, 170, 121, 31));
+
+        horizontalLayout_10->addWidget(BtnCreateClassifier);
+
         LEClassifierStatus = new QLineEdit(TestModule);
         LEClassifierStatus->setObjectName(QString::fromUtf8("LEClassifierStatus"));
-        LEClassifierStatus->setGeometry(QRect(150, 180, 371, 21));
+
+        horizontalLayout_10->addWidget(LEClassifierStatus);
+
+        horizontalLayout_10->setStretch(0, 1);
+        horizontalLayout_10->setStretch(1, 3);
+
+        verticalLayout_2->addLayout(horizontalLayout_10);
+
+        horizontalLayout_11 = new QHBoxLayout();
+        horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
+        BtnSaveClassifier = new QPushButton(TestModule);
+        BtnSaveClassifier->setObjectName(QString::fromUtf8("BtnSaveClassifier"));
+
+        horizontalLayout_11->addWidget(BtnSaveClassifier);
+
+        LEClassifierSaveStatus = new QLineEdit(TestModule);
+        LEClassifierSaveStatus->setObjectName(QString::fromUtf8("LEClassifierSaveStatus"));
+        LEClassifierSaveStatus->setReadOnly(true);
+
+        horizontalLayout_11->addWidget(LEClassifierSaveStatus);
+
+        horizontalLayout_11->setStretch(0, 1);
+        horizontalLayout_11->setStretch(1, 3);
+
+        verticalLayout_2->addLayout(horizontalLayout_11);
+
         groupBox = new QGroupBox(TestModule);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 270, 511, 81));
         horizontalLayout_2 = new QHBoxLayout(groupBox);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalLayout = new QHBoxLayout();
@@ -128,9 +207,11 @@ public:
 
         horizontalLayout_2->addLayout(horizontalLayout);
 
+
+        verticalLayout_2->addWidget(groupBox);
+
         groupBox_2 = new QGroupBox(TestModule);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        groupBox_2->setGeometry(QRect(10, 360, 511, 71));
         horizontalLayout_4 = new QHBoxLayout(groupBox_2);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         horizontalLayout_3 = new QHBoxLayout();
@@ -162,16 +243,29 @@ public:
 
         horizontalLayout_4->addLayout(horizontalLayout_3);
 
+
+        verticalLayout_2->addWidget(groupBox_2);
+
+        horizontalLayout_12 = new QHBoxLayout();
+        horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
         Btn_StartTest = new QPushButton(TestModule);
         Btn_StartTest->setObjectName(QString::fromUtf8("Btn_StartTest"));
-        Btn_StartTest->setGeometry(QRect(10, 450, 81, 31));
+
+        horizontalLayout_12->addWidget(Btn_StartTest);
+
         progressBar = new QProgressBar(TestModule);
         progressBar->setObjectName(QString::fromUtf8("progressBar"));
-        progressBar->setGeometry(QRect(110, 450, 411, 31));
         progressBar->setValue(0);
+
+        horizontalLayout_12->addWidget(progressBar);
+
+        horizontalLayout_12->setStretch(0, 1);
+        horizontalLayout_12->setStretch(1, 3);
+
+        verticalLayout_2->addLayout(horizontalLayout_12);
+
         groupBox_3 = new QGroupBox(TestModule);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
-        groupBox_3->setGeometry(QRect(10, 490, 511, 261));
         horizontalLayout_5 = new QHBoxLayout(groupBox_3);
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
         verticalLayout = new QVBoxLayout();
@@ -199,19 +293,21 @@ public:
 
         horizontalLayout_5->addLayout(verticalLayout);
 
-        BtnSaveClassifier = new QPushButton(TestModule);
-        BtnSaveClassifier->setObjectName(QString::fromUtf8("BtnSaveClassifier"));
-        BtnSaveClassifier->setGeometry(QRect(10, 220, 121, 31));
-        LEClassifierSaveStatus = new QLineEdit(TestModule);
-        LEClassifierSaveStatus->setObjectName(QString::fromUtf8("LEClassifierSaveStatus"));
-        LEClassifierSaveStatus->setGeometry(QRect(150, 230, 371, 21));
-        LEClassifierSaveStatus->setReadOnly(true);
-        BtnOpenPlugin = new QPushButton(TestModule);
-        BtnOpenPlugin->setObjectName(QString::fromUtf8("BtnOpenPlugin"));
-        BtnOpenPlugin->setGeometry(QRect(10, 20, 121, 31));
-        LEPluginStatus = new QLineEdit(TestModule);
-        LEPluginStatus->setObjectName(QString::fromUtf8("LEPluginStatus"));
-        LEPluginStatus->setGeometry(QRect(150, 30, 371, 21));
+
+        verticalLayout_2->addWidget(groupBox_3);
+
+        verticalLayout_2->setStretch(0, 1);
+        verticalLayout_2->setStretch(1, 1);
+        verticalLayout_2->setStretch(2, 1);
+        verticalLayout_2->setStretch(3, 1);
+        verticalLayout_2->setStretch(4, 1);
+        verticalLayout_2->setStretch(5, 1);
+        verticalLayout_2->setStretch(6, 1);
+        verticalLayout_2->setStretch(7, 1);
+        verticalLayout_2->setStretch(8, 6);
+
+        horizontalLayout_13->addLayout(verticalLayout_2);
+
 
         retranslateUi(TestModule);
 
@@ -221,9 +317,11 @@ public:
     void retranslateUi(QDialog *TestModule)
     {
         TestModule->setWindowTitle(QApplication::translate("TestModule", "TestModule", 0, QApplication::UnicodeUTF8));
+        BtnOpenPlugin->setText(QApplication::translate("TestModule", "\346\211\223\345\274\200\345\210\206\347\261\273\345\231\250\346\217\222\344\273\266", 0, QApplication::UnicodeUTF8));
         BtnImportConfig->setText(QApplication::translate("TestModule", "\345\257\274\345\205\245\350\256\255\347\273\203\351\205\215\347\275\256\346\226\207\344\273\266...", 0, QApplication::UnicodeUTF8));
         BtnImportData->setText(QApplication::translate("TestModule", "\345\257\274\345\205\245\350\256\255\347\273\203\346\225\260\346\215\256\346\226\207\344\273\266...", 0, QApplication::UnicodeUTF8));
         BtnCreateClassifier->setText(QApplication::translate("TestModule", "\347\224\237\346\210\220\345\210\206\347\261\273\345\231\250", 0, QApplication::UnicodeUTF8));
+        BtnSaveClassifier->setText(QApplication::translate("TestModule", "\344\277\235\345\255\230\345\210\206\347\261\273\345\231\250", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("TestModule", "\350\202\214\347\224\265\350\207\202\345\270\246\350\277\236\346\216\245\350\256\276\347\275\256", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("TestModule", "\344\270\262\345\217\243\345\217\267\357\274\232", 0, QApplication::UnicodeUTF8));
         cbBox_Armband->clear();
@@ -247,8 +345,6 @@ public:
         groupBox_3->setTitle(QApplication::translate("TestModule", "\346\265\213\350\257\225\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
         Btn_CreateReport->setText(QApplication::translate("TestModule", "\347\224\237\346\210\220\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
         BtnExportReport->setText(QApplication::translate("TestModule", "\345\257\274\345\207\272\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
-        BtnSaveClassifier->setText(QApplication::translate("TestModule", "\344\277\235\345\255\230\345\210\206\347\261\273\345\231\250", 0, QApplication::UnicodeUTF8));
-        BtnOpenPlugin->setText(QApplication::translate("TestModule", "\346\211\223\345\274\200\345\210\206\347\261\273\345\231\250\346\217\222\344\273\266", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

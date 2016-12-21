@@ -18,7 +18,7 @@ class Dlg_TestModule : public QDialog, public Ui_TestModule
 private:
 	// use int to store command
 	// 0: rest
-	// 1: thumb, 2: index, 4: middle, 8: ring, 16: little
+	// 1: thumb, 2: index, 4: middle, 8: ring, 16: little, 32: OpenHand
 	// 256: shangqie, 512: xiaqie
 	// 1024: neifan, 2048: waifan
 	// 4096: neixuan, 8192: waixuan
@@ -41,10 +41,8 @@ private:
 	};
 	std::vector< std::shared_ptr<_commandInfo> > _commandVec;
 
-	// file path
+	// config file paths
 	std::string _mTrainConfigPath;
-	std::string _mTrainDataPath;
-	std::deque<std::vector<double> > _mDataBuffer;
 
 	// ArmBand
 	SJTArmBand* _armBand;

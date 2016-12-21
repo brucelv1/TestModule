@@ -48,6 +48,7 @@ void Dlg_TestModule::on_BtnImportConfig_clicked()
 	{
 		LEConfigPath->setText(filename);
 		_mTrainConfigPath = filename.toStdString();
+		BtnImportConfig->setEnabled(false);
 	}
 }
 
@@ -61,44 +62,47 @@ void Dlg_TestModule::on_BtnImportData_clicked()
 
 	if (!filename.isNull())
 	{
-		LEDataPath->setText(filename);
-		_mTrainDataPath = filename.toStdString();
+		// read config file, and generate label vector
+		_parseTrainConfig();
+		std::vector<int> labelVec;
+		for (size_t i=0; i<_commandVec.size(); i++)
+		{
+			size_t tsp = _commandVec[i]->TotalSample;
+			int label = _commandVec[i]->Command;
+			for (size_t j=0; j<tsp; j++)
+			{
+				labelVec.push_back(label);
+			}
+		}
+
+		// read raw data
+		std::vector<std::vector<double> > trainData;
+		std::ifstream raw_data(filename.toStdString());
+
+		std::vector<double> data_tmp(8,0);
+		std::string val;
+		while(raw_data.good())
+		{
+			for (int i=0; i<8; i++)
+			{
+				raw_data >> val;
+				data_tmp[i] = std::atof(val.c_str());
+			}
+			trainData.push_back(data_tmp);
+		}
+
+		int num_fea, num_label;
+		_mClassifier->AddFeatureLabelFromData(trainData,labelVec,&num_fea,&num_label);
+		char info[200];
+		sprintf_s(info,"%d feature vectors and %d labels in total.", num_fea, num_label);
+		LEDataPath->setText(QString(info));
 	}
 }
 
 void Dlg_TestModule::on_BtnCreateClassifier_clicked()
 {
-	// read config file, and generate label vector
-	_parseTrainConfig();
-	std::vector<int> labelVec;
-	for (size_t i=0; i<_commandVec.size(); i++)
-	{
-		size_t tsp = _commandVec[i]->TotalSample;
-		int label = _commandVec[i]->Command;
-		for (size_t j=0; j<tsp; j++)
-		{
-			labelVec.push_back(label);
-		}
-	}
-
-	// read raw data
-	std::vector<std::vector<double> > trainData;
-	std::ifstream raw_data(_mTrainDataPath);
-
-	std::vector<double> data_tmp(8,0);
-	std::string val;
-	while(raw_data.good())
-	{
-		for (int i=0; i<8; i++)
-		{
-			raw_data >> val;
-			data_tmp[i] = std::atof(val.c_str());
-		}
-		trainData.push_back(data_tmp);
-	}
-
 	// generate a classifier by its specific logic
-	if(_mClassifier->GenerateModel(trainData,labelVec)==true)
+	if(_mClassifier->GenerateModel()==true)
 	{
 		string name = _mClassifier->GetName();
 		name += " model is generated.";
@@ -180,6 +184,13 @@ void Dlg_TestModule::on_Btn_StartTest_clicked()
 	// shuffle
 	std::random_shuffle(testSeries.begin(), testSeries.end());
 
+	// clear statistics
+	_predictPerAction.clear();
+	_rightPrdtPerAction.clear();
+	_firstHitDelay.clear();
+	_holdStability.clear();
+
+	// start testing thread
 	_mThread = boost::thread(boost::bind(&(Dlg_TestModule::_threadSend),this,testSeries));
 }
 

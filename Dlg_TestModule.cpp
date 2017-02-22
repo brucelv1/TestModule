@@ -184,6 +184,21 @@ void Dlg_TestModule::on_Btn_StartTest_clicked()
 	// shuffle
 	std::random_shuffle(testSeries.begin(), testSeries.end());
 
+	// bug: open-hand action has to be between two rest's
+	auto tmp = testSeries;
+	testSeries.clear();
+	for (size_t i=0; i<tmp.size(); i++)
+	{
+		if(tmp[i] == 32)
+		{
+			testSeries.push_back(0);
+			testSeries.push_back(tmp[i]);
+			testSeries.push_back(0);
+		}
+		else
+			testSeries.push_back(tmp[i]);
+	}
+
 	// clear statistics
 	_predictPerAction.clear();
 	_rightPrdtPerAction.clear();
